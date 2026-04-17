@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,384 +20,132 @@
     --accent:      #b8453a;
     --accent-deep: #8f2d24;
     --gold:        #c89434;
-    --line:        #2a241d;
     --shadow:      0 1px 0 rgba(31,27,22,0.08), 0 20px 40px -20px rgba(31,27,22,0.25);
-    --radius:      2px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   html, body { background: var(--paper); color: var(--ink); }
-
   body {
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
+    font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.6;
     min-height: 100vh;
     background-image:
       radial-gradient(circle at 10% 20%, rgba(200,148,52,0.04) 0%, transparent 40%),
       radial-gradient(circle at 90% 80%, rgba(184,69,58,0.04) 0%, transparent 40%);
     background-attachment: fixed;
   }
-
-  /* paper grain */
   body::before {
-    content: "";
-    position: fixed; inset: 0;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.35;
-    mix-blend-mode: multiply;
+    content: ""; position: fixed; inset: 0;
+    pointer-events: none; z-index: 1; opacity: 0.35; mix-blend-mode: multiply;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.10 0 0 0 0 0.08 0 0 0 0.12 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   }
 
-  .display {
-    font-family: 'Fraunces', serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    letter-spacing: -0.02em;
-  }
-
-  /* ============ HEADER ============ */
-  header.masthead {
-    padding: 32px clamp(24px, 5vw, 64px) 0;
-    display: flex; justify-content: space-between; align-items: center;
-    position: relative; z-index: 2;
-  }
-  .mark {
-    font-family: 'Fraunces', serif; font-weight: 500;
-    font-size: 14px; letter-spacing: 0.3em; text-transform: uppercase;
-  }
+  header.masthead { padding: 32px clamp(24px, 5vw, 64px) 0; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; gap: 16px; flex-wrap: wrap; }
+  .mark { font-family: 'Fraunces', serif; font-weight: 500; font-size: 14px; letter-spacing: 0.3em; text-transform: uppercase; }
   .mark span { color: var(--accent); }
-  .session {
-    font-size: 12px; color: var(--ink-mute);
-    letter-spacing: 0.15em; text-transform: uppercase;
-    display: flex; gap: 14px; align-items: center;
-  }
-  .session button {
-    background: none; border: none; color: var(--ink-mute);
-    font: inherit; cursor: pointer; border-bottom: 1px solid transparent;
-    padding: 2px 0; letter-spacing: 0.15em; text-transform: uppercase;
-  }
+  .session { font-size: 12px; color: var(--ink-mute); letter-spacing: 0.15em; text-transform: uppercase; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .session button { background: none; border: none; color: var(--ink-mute); font: inherit; cursor: pointer; border-bottom: 1px solid transparent; padding: 2px 0; letter-spacing: 0.15em; text-transform: uppercase; }
   .session button:hover { color: var(--ink); border-bottom-color: var(--ink); }
+  .session .synced { display: inline-flex; align-items: center; gap: 6px; color: var(--gold); font-style: italic; text-transform: none; letter-spacing: 0.05em; }
+  .session .synced::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
 
-  /* ============ HERO ============ */
-  .hero {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: clamp(60px, 12vh, 120px) clamp(24px, 5vw, 64px) clamp(40px, 8vh, 80px);
-    position: relative; z-index: 2;
-  }
-  .hero .eyebrow {
-    font-size: 12px; letter-spacing: 0.4em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 24px;
-    display: flex; align-items: center; gap: 14px;
-  }
-  .hero .eyebrow::before {
-    content: ""; width: 40px; height: 1px; background: var(--accent);
-  }
-  .hero h1 {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(44px, 8vw, 96px);
-    line-height: 0.95;
-    font-weight: 300;
-    letter-spacing: -0.035em;
-    margin-bottom: 28px;
-  }
-  .hero h1 em {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--accent);
-  }
-  .hero .lede {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(18px, 2vw, 22px);
-    line-height: 1.5;
-    font-weight: 300;
-    color: var(--ink-soft);
-    max-width: 640px;
-    margin-bottom: 40px;
-  }
-  .hero .meta {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 32px;
-    max-width: 720px;
-    padding-top: 32px;
-    border-top: 1px solid var(--ink);
-  }
-  .hero .meta .item .label {
-    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--ink-mute); margin-bottom: 6px;
-  }
-  .hero .meta .item .val {
-    font-family: 'Fraunces', serif;
-    font-size: 18px;
-  }
-
+  .hero { max-width: 1100px; margin: 0 auto; padding: clamp(60px, 12vh, 120px) clamp(24px, 5vw, 64px) clamp(40px, 8vh, 80px); position: relative; z-index: 2; }
+  .hero .eyebrow { font-size: 12px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; display: flex; align-items: center; gap: 14px; }
+  .hero .eyebrow::before { content: ""; width: 40px; height: 1px; background: var(--accent); }
+  .hero h1 { font-family: 'Fraunces', serif; font-size: clamp(44px, 8vw, 96px); line-height: 0.95; font-weight: 300; letter-spacing: -0.035em; margin-bottom: 28px; }
+  .hero h1 em { font-style: italic; font-weight: 400; color: var(--accent); }
+  .hero .lede { font-family: 'Fraunces', serif; font-size: clamp(18px, 2vw, 22px); line-height: 1.5; font-weight: 300; color: var(--ink-soft); max-width: 640px; margin-bottom: 40px; }
+  .hero .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 32px; max-width: 720px; padding-top: 32px; border-top: 1px solid var(--ink); }
+  .hero .meta .item .label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 6px; }
+  .hero .meta .item .val { font-family: 'Fraunces', serif; font-size: 18px; }
   .cta-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 40px; }
 
-  /* ============ BUTTONS ============ */
-  .btn {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase;
-    padding: 18px 32px;
-    border: none; cursor: pointer;
-    transition: all 0.25s ease;
-    font-weight: 500;
-  }
-  .btn-primary {
-    background: var(--ink); color: var(--paper);
-  }
+  .btn { display: inline-flex; align-items: center; gap: 10px; font-family: 'Inter', sans-serif; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; padding: 18px 32px; border: none; cursor: pointer; transition: all 0.25s ease; font-weight: 500; }
+  .btn-primary { background: var(--ink); color: var(--paper); }
   .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
-  .btn-ghost {
-    background: transparent; color: var(--ink);
-    border: 1px solid var(--ink);
-  }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
   .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+  .btn-text { background: transparent; color: var(--ink-mute); border: none; padding: 18px 8px; text-decoration: underline; text-underline-offset: 4px; }
+  .btn-text:hover { color: var(--ink); }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
   .btn .arrow { transition: transform 0.25s; }
   .btn:hover .arrow { transform: translateX(4px); }
 
-  /* ============ QUESTIONNAIRE ============ */
-  .questionnaire {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 40px clamp(24px, 5vw, 64px) 120px;
-    position: relative; z-index: 2;
-    display: none;
-  }
+  .questionnaire { max-width: 780px; margin: 0 auto; padding: 40px clamp(24px, 5vw, 64px) 120px; position: relative; z-index: 2; display: none; }
   .questionnaire.active { display: block; }
 
-  .progress-rail {
-    display: flex; align-items: center; gap: 14px;
-    margin-bottom: 56px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid rgba(31,27,22,0.15);
-  }
-  .progress-rail .count {
-    font-family: 'Fraunces', serif;
-    font-size: 14px; font-weight: 500;
-    letter-spacing: 0.1em;
-    color: var(--accent);
-  }
-  .progress-rail .bar {
-    flex: 1; height: 1px; background: rgba(31,27,22,0.15);
-    position: relative; overflow: hidden;
-  }
-  .progress-rail .bar::after {
-    content: ""; position: absolute; inset: 0;
-    background: var(--accent);
-    width: var(--pct, 0%);
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .progress-rail .section-name {
-    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--ink-mute);
-  }
+  .progress-rail { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid rgba(31,27,22,0.15); }
+  .progress-rail .count { font-family: 'Fraunces', serif; font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: var(--accent); }
+  .progress-rail .bar { flex: 1; height: 1px; background: rgba(31,27,22,0.15); position: relative; overflow: hidden; }
+  .progress-rail .bar::after { content: ""; position: absolute; inset: 0; background: var(--accent); width: var(--pct, 0%); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+  .progress-rail .section-name { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); }
 
-  .step {
-    display: none;
-    animation: fadeUp 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+  .step { display: none; animation: fadeUp 0.55s cubic-bezier(0.4, 0, 0.2, 1); }
   .step.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  .step-eyebrow { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .step-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .step h2 { font-family: 'Fraunces', serif; font-size: clamp(28px, 4vw, 42px); line-height: 1.1; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .step .optional-tag { display: inline-block; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); font-style: normal; background: rgba(122,111,97,0.12); padding: 3px 10px; margin-left: 10px; vertical-align: middle; font-family: 'Inter', sans-serif; font-weight: 500; }
+  .step .helper { font-family: 'Fraunces', serif; font-size: 17px; font-style: italic; color: var(--ink-mute); margin-bottom: 36px; line-height: 1.5; }
 
-  .step-eyebrow {
-    font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--ink-mute); margin-bottom: 16px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .step-eyebrow .dot {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
-  }
-  .step h2 {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(28px, 4vw, 42px);
-    line-height: 1.1;
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    margin-bottom: 14px;
-  }
-  .step .helper {
-    font-family: 'Fraunces', serif;
-    font-size: 17px; font-style: italic;
-    color: var(--ink-mute);
-    margin-bottom: 36px;
-    line-height: 1.5;
-  }
-
-  /* inputs */
   .field { margin-bottom: 32px; }
-  .field label {
-    display: block;
-    font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--ink-soft); margin-bottom: 10px;
-    font-weight: 500;
-  }
-  .field input[type=text],
-  .field input[type=email],
-  .field input[type=url],
-  .field textarea {
-    width: 100%;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid var(--ink);
-    padding: 10px 0 12px;
-    font-family: 'Fraunces', serif;
-    font-size: 20px;
-    color: var(--ink);
-    resize: vertical;
-    transition: border-color 0.2s;
-  }
+  .field label { display: block; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; font-weight: 500; }
+  .field input[type=text], .field input[type=email], .field input[type=url], .field textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--ink); padding: 10px 0 12px; font-family: 'Fraunces', serif; font-size: 20px; color: var(--ink); resize: vertical; transition: border-color 0.2s; }
   .field textarea { min-height: 140px; font-size: 17px; line-height: 1.55; }
-  .field input:focus, .field textarea:focus {
-    outline: none; border-bottom-color: var(--accent); border-bottom-width: 2px;
-  }
-  .field input::placeholder, .field textarea::placeholder {
-    color: var(--ink-mute); font-style: italic; font-weight: 300;
-  }
-  .field .hint {
-    font-size: 13px; color: var(--ink-mute);
-    margin-top: 8px; font-style: italic;
-  }
+  .field input:focus, .field textarea:focus { outline: none; border-bottom-color: var(--accent); border-bottom-width: 2px; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--ink-mute); font-style: italic; font-weight: 300; }
 
-  .nav-row {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 48px; padding-top: 32px;
-    border-top: 1px solid rgba(31,27,22,0.15);
-    gap: 16px; flex-wrap: wrap;
-  }
-  .save-status {
-    font-size: 12px; color: var(--ink-mute); letter-spacing: 0.1em;
-    text-transform: uppercase; font-style: italic;
-  }
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 48px; padding-top: 32px; border-top: 1px solid rgba(31,27,22,0.15); gap: 16px; flex-wrap: wrap; }
+  .nav-left { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .nav-right { display: flex; gap: 8px; align-items: center; }
+  .save-status { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.1em; text-transform: uppercase; font-style: italic; }
   .save-status.saved { color: var(--gold); }
 
-  /* file upload */
-  .photo-drop {
-    border: 1.5px dashed rgba(31,27,22,0.3);
-    padding: 40px 24px; text-align: center;
-    background: rgba(255,255,255,0.3);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .photo-drop:hover {
-    border-color: var(--accent);
-    background: rgba(255,255,255,0.5);
-  }
-  .photo-drop.dragover {
-    border-color: var(--accent); background: rgba(184,69,58,0.08);
-  }
+  .photo-drop { border: 1.5px dashed rgba(31,27,22,0.3); padding: 40px 24px; text-align: center; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.2s; }
+  .photo-drop:hover { border-color: var(--accent); background: rgba(255,255,255,0.5); }
+  .photo-drop.dragover { border-color: var(--accent); background: rgba(184,69,58,0.08); }
   .photo-drop .icon { font-family: 'Fraunces', serif; font-size: 48px; color: var(--ink-mute); line-height: 1; margin-bottom: 12px; }
   .photo-drop .prim { font-family: 'Fraunces', serif; font-size: 18px; margin-bottom: 4px; }
   .photo-drop .sec { font-size: 13px; color: var(--ink-mute); }
   .photo-drop input[type=file] { display: none; }
-  .photo-preview {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px; margin-top: 20px;
-  }
-  .photo-preview .p {
-    position: relative; aspect-ratio: 1; overflow: hidden;
-    background: var(--paper-deep);
-  }
+  .photo-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 20px; }
+  .photo-preview .p { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--paper-deep); }
   .photo-preview .p img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .photo-preview .p .rm {
-    position: absolute; top: 6px; right: 6px;
-    background: var(--ink); color: var(--paper);
-    width: 24px; height: 24px; border: none; cursor: pointer;
-    font-size: 14px; line-height: 1;
-  }
+  .photo-preview .p .rm { position: absolute; top: 6px; right: 6px; background: var(--ink); color: var(--paper); width: 24px; height: 24px; border: none; cursor: pointer; font-size: 14px; line-height: 1; }
 
-  /* ============ SUCCESS SCREEN ============ */
-  .success {
-    max-width: 720px; margin: 0 auto;
-    padding: clamp(80px, 15vh, 140px) clamp(24px, 5vw, 64px);
-    text-align: center;
-    position: relative; z-index: 2;
-    display: none;
-  }
+  .success { max-width: 720px; margin: 0 auto; padding: clamp(80px, 15vh, 140px) clamp(24px, 5vw, 64px); text-align: center; position: relative; z-index: 2; display: none; }
   .success.active { display: block; }
-  .success .ornament {
-    font-family: 'Fraunces', serif; font-size: 60px; color: var(--accent);
-    margin-bottom: 32px; line-height: 1;
-  }
-  .success h2 {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(36px, 5vw, 56px);
-    font-weight: 400; line-height: 1.1;
-    letter-spacing: -0.02em; margin-bottom: 24px;
-  }
+  .success .ornament { font-family: 'Fraunces', serif; font-size: 60px; color: var(--accent); margin-bottom: 32px; line-height: 1; }
+  .success h2 { font-family: 'Fraunces', serif; font-size: clamp(36px, 5vw, 56px); font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 24px; }
   .success h2 em { font-style: italic; color: var(--accent); }
-  .success p {
-    font-family: 'Fraunces', serif; font-size: 20px;
-    color: var(--ink-soft); line-height: 1.6; font-weight: 300;
-    max-width: 520px; margin: 0 auto 40px;
-  }
+  .success p { font-family: 'Fraunces', serif; font-size: 20px; color: var(--ink-soft); line-height: 1.6; font-weight: 300; max-width: 520px; margin: 0 auto 40px; }
 
-  /* ============ MODAL ============ */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(31,27,22,0.6);
-    display: none; align-items: center; justify-content: center;
-    z-index: 100; padding: 24px;
-    backdrop-filter: blur(4px);
-  }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(31,27,22,0.6); display: none; align-items: center; justify-content: center; z-index: 100; padding: 24px; backdrop-filter: blur(4px); animation: fadeIn 0.25s; }
   .modal-overlay.active { display: flex; }
-  .modal {
-    background: var(--paper); max-width: 460px; width: 100%;
-    padding: 48px 40px; box-shadow: var(--shadow);
-    position: relative;
-  }
-  .modal h3 {
-    font-family: 'Fraunces', serif; font-size: 28px; font-weight: 400;
-    letter-spacing: -0.01em; margin-bottom: 12px;
-  }
-  .modal p { color: var(--ink-soft); margin-bottom: 24px; font-size: 15px; }
-  .modal .field { margin-bottom: 24px; }
-  .modal .close {
-    position: absolute; top: 16px; right: 16px;
-    background: none; border: none; font-size: 20px; cursor: pointer;
-    color: var(--ink-mute); line-height: 1;
-  }
-  .modal .feedback {
-    font-size: 13px; margin-top: 14px;
-    padding: 10px 14px;
-    background: rgba(200, 148, 52, 0.15);
-    border-left: 2px solid var(--gold);
-    color: var(--ink-soft);
-  }
-  .modal .feedback.error {
-    background: rgba(184,69,58,0.1);
-    border-left-color: var(--accent);
-  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal { background: var(--paper); max-width: 480px; width: 100%; padding: 48px 40px; box-shadow: var(--shadow); position: relative; animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .modal h3 { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 12px; }
+  .modal h3 em { font-style: italic; color: var(--accent); }
+  .modal p { color: var(--ink-soft); margin-bottom: 24px; font-size: 15px; line-height: 1.55; }
+  .modal .field { margin-bottom: 20px; }
+  .modal .field input { font-size: 18px !important; }
+  .modal .close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink-mute); line-height: 1; }
+  .modal .feedback { font-size: 13px; margin-top: 14px; padding: 10px 14px; background: rgba(184,69,58,0.1); border-left: 2px solid var(--accent); color: var(--ink-soft); }
 
-  /* loader */
-  .spinner {
-    display: inline-block; width: 14px; height: 14px;
-    border: 1.5px solid currentColor; border-top-color: transparent;
-    border-radius: 50%; animation: spin 0.7s linear infinite;
-  }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 1.5px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ============ FOOTER ============ */
-  footer {
-    padding: 32px clamp(24px, 5vw, 64px);
-    border-top: 1px solid rgba(31,27,22,0.15);
-    display: flex; justify-content: space-between;
-    font-size: 12px; color: var(--ink-mute);
-    letter-spacing: 0.1em; text-transform: uppercase;
-    position: relative; z-index: 2;
-    flex-wrap: wrap; gap: 12px;
-  }
+  footer { padding: 32px clamp(24px, 5vw, 64px); border-top: 1px solid rgba(31,27,22,0.15); display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-mute); letter-spacing: 0.1em; text-transform: uppercase; position: relative; z-index: 2; flex-wrap: wrap; gap: 12px; }
+
+  #appToast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(200%); background: var(--ink); color: var(--paper); padding: 12px 24px; z-index: 200; font-size: 13px; letter-spacing: 0.05em; box-shadow: var(--shadow); transition: transform 0.3s; }
+  #appToast.show { transform: translateX(-50%) translateY(0); }
 
   @media (max-width: 640px) {
-    .nav-row .btn { flex: 1; justify-content: center; padding: 16px 20px; }
+    .nav-row { flex-direction: column; align-items: stretch; }
+    .nav-left, .nav-right { width: 100%; justify-content: space-between; }
+    .nav-right .btn-primary { flex: 1; justify-content: center; }
   }
 </style>
 </head>
@@ -406,69 +155,53 @@
   <div class="mark">Family &mdash; <span>Est. Spotlight</span></div>
   <div class="session">
     <span id="sessionEmail"></span>
-    <button id="signOutBtn" style="display:none">Sign out</button>
+    <button id="switchAccountBtn" style="display:none">Use different email</button>
     <button id="resumeBtn">Resume progress</button>
   </div>
 </header>
 
-<!-- ============ LANDING ============ -->
 <main class="hero" id="landing">
   <div class="eyebrow">An invitation</div>
   <h1>Tell us the<br/>story of your<br/><em>business.</em></h1>
   <p class="lede">
-    We're gathering the quiet, remarkable ventures our family has built —
+    We're gathering the quiet, remarkable ventures our family has built &mdash;
     so the next generation knows what's possible, and who to turn to.
-    Your answers become a profile featured on our Family Spotlight.
+    Share as much or as little as you'd like. Skip anything. Come back anytime.
   </p>
 
   <div class="cta-row">
-    <button class="btn btn-primary" id="beginBtn">
-      Begin the questionnaire <span class="arrow">&rarr;</span>
-    </button>
-    <button class="btn btn-ghost" id="heroResumeBtn">
-      Continue where I left off
-    </button>
+    <button class="btn btn-primary" id="beginBtn">Begin the questionnaire <span class="arrow">&rarr;</span></button>
+    <button class="btn btn-ghost" id="heroResumeBtn">Continue where I left off</button>
   </div>
 
   <div class="meta">
-    <div class="item">
-      <div class="label">Time needed</div>
-      <div class="val">15&ndash;20 minutes</div>
-    </div>
-    <div class="item">
-      <div class="label">Save &amp; resume</div>
-      <div class="val">Always available</div>
-    </div>
-    <div class="item">
-      <div class="label">Questions</div>
-      <div class="val">Four short sections</div>
-    </div>
+    <div class="item"><div class="label">Time needed</div><div class="val">15&ndash;20 minutes</div></div>
+    <div class="item"><div class="label">Every question</div><div class="val">Optional &amp; skippable</div></div>
+    <div class="item"><div class="label">Save &amp; resume</div><div class="val">Anytime, any device</div></div>
   </div>
 </main>
 
-<!-- ============ QUESTIONNAIRE ============ -->
 <main class="questionnaire" id="questionnaire">
   <div class="progress-rail">
-    <span class="count" id="stepCount">01 / 12</span>
+    <span class="count" id="stepCount">01 / 17</span>
     <div class="bar" id="progressBar"></div>
     <span class="section-name" id="sectionName">The basics</span>
   </div>
 
-  <!-- Steps injected by JS -->
   <div id="stepContainer"></div>
 
   <div class="nav-row">
-    <div style="display:flex; gap:12px; align-items:center;">
+    <div class="nav-left">
       <button class="btn btn-ghost" id="prevBtn">&larr; Back</button>
       <span class="save-status" id="saveStatus"></span>
     </div>
-    <button class="btn btn-primary" id="nextBtn">
-      Continue <span class="arrow">&rarr;</span>
-    </button>
+    <div class="nav-right">
+      <button class="btn btn-text" id="skipBtn">Skip this</button>
+      <button class="btn btn-primary" id="nextBtn">Continue <span class="arrow">&rarr;</span></button>
+    </div>
   </div>
 </main>
 
-<!-- ============ SUCCESS ============ -->
 <main class="success" id="success">
   <div class="ornament">&#10042;</div>
   <h2>Thank you, <em>truly.</em></h2>
@@ -484,117 +217,130 @@
   <span>A portal for our family, by our family</span>
 </footer>
 
-<!-- ============ AUTH MODAL ============ -->
-<div class="modal-overlay" id="authModal">
+<!-- ============ EMAIL MODAL (first-time entry) ============ -->
+<div class="modal-overlay" id="emailModal">
   <div class="modal">
-    <button class="close" id="closeAuth">&times;</button>
-    <h3 id="authTitle">Save your progress</h3>
-    <p id="authCopy">Enter your email and we'll send you a magic link. Click it to continue — no password needed.</p>
+    <button class="close" id="closeEmailModal">&times;</button>
+    <h3>Before we begin &mdash; <em>your email?</em></h3>
+    <p>So you can save your progress and come back any time, on any device. Type it twice to be sure.</p>
     <div class="field">
       <label>Email address</label>
-      <input type="email" id="authEmail" placeholder="you@example.com" />
+      <input type="email" id="emailInput1" placeholder="you@example.com" autocomplete="email" />
     </div>
-    <button class="btn btn-primary" id="sendMagicLink" style="width:100%; justify-content:center;">
-      Send magic link
+    <div class="field">
+      <label>Confirm email</label>
+      <input type="email" id="emailInput2" placeholder="Type it again" autocomplete="email" />
+    </div>
+    <button class="btn btn-primary" id="submitEmailBtn" style="width:100%; justify-content:center;">
+      Start writing <span class="arrow">&rarr;</span>
     </button>
-    <div class="feedback" id="authFeedback" style="display:none;"></div>
+    <div class="feedback" id="emailFeedback" style="display:none;"></div>
   </div>
 </div>
+
+<!-- ============ RESUME MODAL ============ -->
+<div class="modal-overlay" id="resumeModal">
+  <div class="modal">
+    <button class="close" id="closeResumeModal">&times;</button>
+    <h3>Welcome <em>back.</em></h3>
+    <p>Enter the email you used before and we'll load your progress.</p>
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" id="resumeEmailInput" placeholder="you@example.com" autocomplete="email" />
+    </div>
+    <button class="btn btn-primary" id="resumeSubmitBtn" style="width:100%; justify-content:center;">
+      Load my progress <span class="arrow">&rarr;</span>
+    </button>
+    <div class="feedback" id="resumeFeedback" style="display:none;"></div>
+  </div>
+</div>
+
+<div id="appToast"></div>
 
 <script>
 // ============================================================
 // QUESTIONNAIRE DEFINITION
 // ============================================================
 const QUESTIONS = [
-  // Section 1: The basics
-  { section: "The basics", key: "owner_name", label: "Your name",
-    type: "text", placeholder: "First and last name",
-    eyebrow: "Let's start simple", title: "Who are we speaking with?",
-    helper: "This will appear on your profile page." },
+  { section: "The basics", key: "owner_name", label: "Your name", type: "text",
+    placeholder: "First and last name", eyebrow: "Let's start simple",
+    title: "Who are we speaking with?", helper: "This will appear on your profile page." },
 
-  { section: "The basics", key: "business_name", label: "Name of your business",
-    type: "text", placeholder: "The name you're proud of",
-    eyebrow: "About your venture", title: "What is your business called?",
-    helper: "Exactly as you'd like it printed — capitalization and all." },
+  { section: "The basics", key: "business_name", label: "Name of your business", type: "text",
+    placeholder: "The name you're proud of", eyebrow: "About your venture",
+    title: "What is your business called?", helper: "Exactly as you'd like it printed &mdash; capitalization and all." },
 
-  { section: "The basics", key: "one_liner", label: "In one sentence, what do you do?",
-    type: "text", placeholder: "We help ___ by ___",
-    eyebrow: "The elevator pitch", title: "Describe your business in a sentence.",
-    helper: "Imagine explaining it to a cousin at a family dinner." },
+  { section: "The basics", key: "one_liner", label: "In one sentence, what do you do?", type: "text",
+    placeholder: "We help ___ by ___", eyebrow: "The elevator pitch",
+    title: "Describe your business in a sentence.", helper: "Imagine explaining it to a cousin at a family dinner." },
 
-  // Section 2: Spotlight interview
-  { section: "Spotlight interview", key: "intro", label: "Introduce yourself and your business",
-    type: "textarea", placeholder: "A paragraph or two about you and what you've built...",
+  { section: "Spotlight interview", key: "intro", label: "Introduce yourself and your business", type: "textarea",
+    placeholder: "A paragraph or two about you and what you've built...",
     eyebrow: "Spotlight interview", title: "Introduce yourself.",
     helper: "Who are you, what did you build, and how long has it been going?" },
 
-  { section: "Spotlight interview", key: "inspiration", label: "What inspired you to start?",
-    type: "textarea", placeholder: "The spark, the moment, the people who shaped this...",
+  { section: "Spotlight interview", key: "inspiration", label: "What inspired you to start?", type: "textarea",
+    placeholder: "The spark, the moment, the people who shaped this...",
     eyebrow: "Spotlight interview", title: "What inspired this venture?",
-    helper: "And how did your family — past or present — influence the journey?" },
+    helper: "And how did your family &mdash; past or present &mdash; influence the journey?" },
 
-  { section: "Spotlight interview", key: "purpose", label: "The problem or need you're addressing",
-    type: "textarea", placeholder: "What does the world gain from your business existing?",
+  { section: "Spotlight interview", key: "purpose", label: "The problem or need you're addressing", type: "textarea",
+    placeholder: "What does the world gain from your business existing?",
     eyebrow: "Spotlight interview", title: "What is this business really about?",
-    helper: "Beyond the products or services — what's the real purpose?" },
+    helper: "Beyond the products or services &mdash; what's the real purpose?" },
 
-  { section: "Spotlight interview", key: "hopes", label: "What do you hope family takes away?",
-    type: "textarea", placeholder: "Lessons, inspiration, possibilities...",
+  { section: "Spotlight interview", key: "hopes", label: "What do you hope family takes away?", type: "textarea",
+    placeholder: "Lessons, inspiration, possibilities...",
     eyebrow: "Spotlight interview", title: "What do you hope younger family members learn from your story?",
     helper: "This is what we'll likely pull into the presentation." },
 
-  { section: "Spotlight interview", key: "support", label: "How can family best support you?",
-    type: "textarea", placeholder: "Referrals, feedback, collaboration, a phone call...",
+  { section: "Spotlight interview", key: "support", label: "How can family best support you?", type: "textarea",
+    placeholder: "Referrals, feedback, collaboration, a phone call...",
     eyebrow: "Spotlight interview", title: "How can our family best support your business?",
-    helper: "Be specific — it helps us help you." },
+    helper: "Be specific &mdash; it helps us help you." },
 
-  // Section 3: Behind the scenes
-  { section: "Behind the scenes", key: "routine", label: "One part of your daily routine",
-    type: "textarea", placeholder: "The small ritual that keeps things moving...",
+  { section: "Behind the scenes", key: "routine", label: "One part of your daily routine", type: "textarea",
+    placeholder: "The small ritual that keeps things moving...",
     eyebrow: "A day in the life", title: "Walk us through a slice of your routine.",
-    helper: "Morning coffee, end-of-day review, weekly rhythm — anything that captures the rhythm." },
+    helper: "Morning coffee, end-of-day review, weekly rhythm &mdash; anything that captures the rhythm." },
 
-  { section: "Behind the scenes", key: "challenge", label: "A challenge you've overcome",
-    type: "textarea", placeholder: "What nearly broke it, and how you pulled through...",
+  { section: "Behind the scenes", key: "challenge", label: "A challenge you've overcome", type: "textarea",
+    placeholder: "What nearly broke it, and how you pulled through...",
     eyebrow: "A day in the life", title: "Share a challenge you've overcome.",
     helper: "The honest version, not the polished one. We'll edit together if needed." },
 
-  { section: "Behind the scenes", key: "win", label: "A small win you're proud of",
-    type: "textarea", placeholder: "A recent moment that made you smile at the work...",
+  { section: "Behind the scenes", key: "win", label: "A small win you're proud of", type: "textarea",
+    placeholder: "A recent moment that made you smile at the work...",
     eyebrow: "A day in the life", title: "Share a small win.",
-    helper: "Doesn't need to be a milestone — just something real." },
+    helper: "Doesn't need to be a milestone &mdash; just something real." },
 
-  // Section 4: Lessons & advice
-  { section: "Lessons &amp; advice", key: "lesson", label: "A lesson you wish you'd known earlier",
-    type: "textarea", placeholder: "The thing you tell yourself three years ago...",
+  { section: "Lessons &amp; advice", key: "lesson", label: "A lesson you wish you'd known earlier", type: "textarea",
+    placeholder: "The thing you'd tell yourself three years ago...",
     eyebrow: "Lessons &amp; advice", title: "What do you wish you'd known earlier?",
     helper: "One lesson, honestly told." },
 
-  { section: "Lessons &amp; advice", key: "principle", label: "A principle, habit, or mindset that's helped",
-    type: "textarea", placeholder: "The rule you keep coming back to...",
+  { section: "Lessons &amp; advice", key: "principle", label: "A principle, habit, or mindset that's helped", type: "textarea",
+    placeholder: "The rule you keep coming back to...",
     eyebrow: "Lessons &amp; advice", title: "What principle has shaped your success?",
     helper: "And why has it worked for you?" },
 
-  { section: "Lessons &amp; advice", key: "advice", label: "Advice for a family member starting out",
-    type: "textarea", placeholder: "What you'd say to a cousin with a dream and no plan...",
+  { section: "Lessons &amp; advice", key: "advice", label: "Advice for a family member starting out", type: "textarea",
+    placeholder: "What you'd say to a cousin with a dream and no plan...",
     eyebrow: "Lessons &amp; advice", title: "Advice for the next generation.",
     helper: "This is the one we'll frame on the wall." },
 
-  // Section 5: Photos & contact
-  { section: "Photos &amp; contact", key: "photos", label: "Behind-the-scenes photos",
-    type: "photos",
+  { section: "Photos &amp; contact", key: "photos", label: "Behind-the-scenes photos", type: "photos",
     eyebrow: "Almost done", title: "Share 1&ndash;2 photos of you at work.",
     helper: "Your workspace, a product shot, a candid moment. Anything that captures the feel." },
 
-  { section: "Photos &amp; contact", key: "contact", label: "How people can find you",
-    type: "contact",
+  { section: "Photos &amp; contact", key: "contact", label: "How people can find you", type: "contact",
     eyebrow: "Almost done", title: "Where can people find your business?",
     helper: "Fill in whatever applies. We'll only display what you share." },
 
-  { section: "Photos &amp; contact", key: "open_to", label: "Open to mentorship or internships?",
-    type: "textarea", placeholder: "Yes/no, and what kind of learner would thrive with you...",
+  { section: "Photos &amp; contact", key: "open_to", label: "Open to mentorship or internships?", type: "textarea",
+    placeholder: "Yes/no, and what kind of learner would thrive with you...",
     eyebrow: "Almost done", title: "Are you open to mentoring a younger family member?",
-    helper: "Totally optional — skip if not relevant right now." },
+    helper: "Totally optional &mdash; skip if not relevant right now." },
 ];
 
 // ============================================================
@@ -602,6 +348,8 @@ const QUESTIONS = [
 // ============================================================
 const cfg = window.APP_CONFIG;
 const sb = supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+const EMAIL_KEY = 'family_portal_email';
+const LOCAL_KEY = 'family_portal_draft_v2';
 
 let state = {
   currentStep: 0,
@@ -614,116 +362,227 @@ let state = {
 };
 
 // ============================================================
-// AUTH
+// LOCAL STORAGE
 // ============================================================
-async function checkAuth() {
-  const { data } = await sb.auth.getSession();
-  if (data.session) {
-    state.email = data.session.user.email;
-    document.getElementById('sessionEmail').textContent = state.email;
-    document.getElementById('signOutBtn').style.display = 'inline';
-    await loadExistingSubmission();
-    // if they have existing progress, show a subtle note
-  }
+function saveLocal() {
+  try {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify({
+      currentStep: state.currentStep,
+      answers: state.answers,
+      contact: state.contact,
+      photos: state.photos,
+      submissionId: state.submissionId,
+      email: state.email,
+      updatedAt: Date.now(),
+    }));
+  } catch(e) {}
 }
 
-async function loadExistingSubmission() {
-  const { data, error } = await sb
-    .from('submissions')
-    .select('*')
-    .eq('email', state.email)
-    .order('updated_at', { ascending: false })
-    .limit(1);
-
-  if (!error && data && data.length > 0) {
-    const sub = data[0];
-    state.submissionId = sub.id;
-    state.answers = sub.answers || {};
-    state.photos = sub.photos || [];
-    state.contact = (sub.answers && sub.answers.contact) || {};
-
-    if (sub.status === 'submitted' || sub.status === 'published') {
-      // already submitted — show success
-      showSuccess();
-      return;
-    }
-
-    // Restore UI if they have answers
-    if (Object.keys(state.answers).length > 0) {
-      const lastAnswered = QUESTIONS.findIndex(q => !state.answers[q.key]);
-      state.currentStep = lastAnswered === -1 ? QUESTIONS.length - 1 : Math.max(0, lastAnswered);
-    }
-  }
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(LOCAL_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
 }
 
-async function openAuthModal(mode = 'save') {
-  const modal = document.getElementById('authModal');
-  const title = document.getElementById('authTitle');
-  const copy = document.getElementById('authCopy');
-  if (mode === 'resume') {
-    title.textContent = 'Resume your progress';
-    copy.textContent = "Enter the email you used last time. We'll send you a magic link to pick up where you left off.";
-  } else {
-    title.textContent = 'Save your progress';
-    copy.textContent = "Enter your email and we'll send you a magic link. Click it to continue — no password needed.";
-  }
+function clearLocal() {
+  try {
+    localStorage.removeItem(LOCAL_KEY);
+    localStorage.removeItem(EMAIL_KEY);
+  } catch(e) {}
+}
+
+function rememberEmail(email) {
+  try { localStorage.setItem(EMAIL_KEY, email); } catch(e) {}
+}
+
+function getRememberedEmail() {
+  try { return localStorage.getItem(EMAIL_KEY); } catch(e) { return null; }
+}
+
+// ============================================================
+// EMAIL MODALS
+// ============================================================
+function openEmailModal() {
+  const modal = document.getElementById('emailModal');
   modal.classList.add('active');
-  document.getElementById('authEmail').focus();
+  document.getElementById('emailInput1').value = '';
+  document.getElementById('emailInput2').value = '';
+  document.getElementById('emailFeedback').style.display = 'none';
+  setTimeout(() => document.getElementById('emailInput1').focus(), 100);
 }
 
-document.getElementById('closeAuth').onclick = () => {
-  document.getElementById('authModal').classList.remove('active');
+function openResumeModal() {
+  const modal = document.getElementById('resumeModal');
+  modal.classList.add('active');
+  // Pre-fill if we remember the last email
+  const remembered = getRememberedEmail();
+  document.getElementById('resumeEmailInput').value = remembered || '';
+  document.getElementById('resumeFeedback').style.display = 'none';
+  setTimeout(() => document.getElementById('resumeEmailInput').focus(), 100);
+}
+
+document.getElementById('closeEmailModal').onclick = () => {
+  document.getElementById('emailModal').classList.remove('active');
+};
+document.getElementById('closeResumeModal').onclick = () => {
+  document.getElementById('resumeModal').classList.remove('active');
 };
 
-document.getElementById('sendMagicLink').onclick = async () => {
-  const email = document.getElementById('authEmail').value.trim().toLowerCase();
-  const fb = document.getElementById('authFeedback');
-  const btn = document.getElementById('sendMagicLink');
+// Submit email (first time)
+document.getElementById('submitEmailBtn').onclick = submitNewEmail;
+document.getElementById('emailInput2').addEventListener('keypress', e => { if (e.key === 'Enter') submitNewEmail(); });
 
-  if (!email || !email.includes('@')) {
-    fb.textContent = 'Please enter a valid email.';
-    fb.className = 'feedback error'; fb.style.display = 'block';
+async function submitNewEmail() {
+  const e1 = document.getElementById('emailInput1').value.trim().toLowerCase();
+  const e2 = document.getElementById('emailInput2').value.trim().toLowerCase();
+  const fb = document.getElementById('emailFeedback');
+  const btn = document.getElementById('submitEmailBtn');
+
+  fb.style.display = 'none';
+
+  if (!e1 || !e1.includes('@') || !e1.includes('.')) {
+    fb.textContent = 'Please enter a valid email address.';
+    fb.style.display = 'block'; return;
+  }
+  if (e1 !== e2) {
+    fb.textContent = "The two emails don't match. Please try again.";
+    fb.style.display = 'block'; return;
+  }
+
+  btn.innerHTML = '<span class="spinner"></span> Loading...';
+  btn.disabled = true;
+
+  state.email = e1;
+  rememberEmail(e1);
+
+  // Check if a submission already exists for this email
+  await loadServerSubmission(e1);
+
+  // Sync any local progress to server
+  await saveProgress(true);
+
+  document.getElementById('emailModal').classList.remove('active');
+  updateHeaderSession();
+  startQuestionnaire();
+
+  btn.innerHTML = 'Start writing <span class="arrow">&rarr;</span>';
+  btn.disabled = false;
+}
+
+// Resume flow
+document.getElementById('resumeSubmitBtn').onclick = submitResumeEmail;
+document.getElementById('resumeEmailInput').addEventListener('keypress', e => { if (e.key === 'Enter') submitResumeEmail(); });
+
+async function submitResumeEmail() {
+  const email = document.getElementById('resumeEmailInput').value.trim().toLowerCase();
+  const fb = document.getElementById('resumeFeedback');
+  const btn = document.getElementById('resumeSubmitBtn');
+
+  fb.style.display = 'none';
+
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    fb.textContent = 'Please enter a valid email address.';
+    fb.style.display = 'block'; return;
+  }
+
+  btn.innerHTML = '<span class="spinner"></span> Loading...';
+  btn.disabled = true;
+
+  state.email = email;
+  rememberEmail(email);
+
+  const found = await loadServerSubmission(email);
+
+  if (!found) {
+    fb.textContent = "We don't have any saved progress for that email. Double-check, or start a new one from the home page.";
+    fb.style.display = 'block';
+    state.email = null;
+    btn.innerHTML = 'Load my progress <span class="arrow">&rarr;</span>';
+    btn.disabled = false;
     return;
   }
 
-  btn.innerHTML = '<span class="spinner"></span> Sending...';
-  btn.disabled = true;
-
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: window.location.href.split('#')[0].split('?')[0] }
-  });
-
-  if (error) {
-    fb.textContent = 'Something went wrong: ' + error.message;
-    fb.className = 'feedback error'; fb.style.display = 'block';
-  } else {
-    fb.innerHTML = '<strong>Check your email.</strong> We sent a magic link to <em>' + email + '</em>. Click it to continue.';
-    fb.className = 'feedback'; fb.style.display = 'block';
+  // If submission is already submitted, show success
+  if (state.submissionAlreadyFinalized) {
+    document.getElementById('resumeModal').classList.remove('active');
+    showSuccess();
+    return;
   }
-  btn.innerHTML = 'Send magic link';
-  btn.disabled = false;
-};
 
-document.getElementById('signOutBtn').onclick = async () => {
-  await sb.auth.signOut();
+  document.getElementById('resumeModal').classList.remove('active');
+  updateHeaderSession();
+  startQuestionnaire();
+  showToast('Loaded your progress');
+
+  btn.innerHTML = 'Load my progress <span class="arrow">&rarr;</span>';
+  btn.disabled = false;
+}
+
+document.getElementById('switchAccountBtn').onclick = () => {
+  if (!confirm('Switch to a different email? Your current progress on this device will be cleared.')) return;
+  clearLocal();
   location.reload();
 };
 
-document.getElementById('resumeBtn').onclick = () => openAuthModal('resume');
-document.getElementById('heroResumeBtn').onclick = () => openAuthModal('resume');
+function updateHeaderSession() {
+  const el = document.getElementById('sessionEmail');
+  if (state.email) {
+    el.innerHTML = `<span class="synced">Saving as ${state.email}</span>`;
+    document.getElementById('switchAccountBtn').style.display = 'inline';
+  } else {
+    el.innerHTML = '';
+    document.getElementById('switchAccountBtn').style.display = 'none';
+  }
+}
+
+async function loadServerSubmission(email) {
+  const { data, error } = await sb
+    .from('submissions')
+    .select('*')
+    .eq('email', email)
+    .order('updated_at', { ascending: false })
+    .limit(1);
+
+  if (error || !data || data.length === 0) return false;
+
+  const sub = data[0];
+  state.submissionId = sub.id;
+  state.answers = sub.answers || {};
+  state.photos = sub.photos || [];
+  state.contact = (sub.answers && sub.answers.contact) || {};
+
+  if (sub.status === 'submitted' || sub.status === 'published') {
+    state.submissionAlreadyFinalized = true;
+    return true;
+  }
+
+  // Advance to last unanswered question
+  if (Object.keys(state.answers).length > 0) {
+    const lastAnswered = QUESTIONS.findIndex(q => !state.answers[q.key]);
+    state.currentStep = lastAnswered === -1 ? QUESTIONS.length - 1 : Math.max(0, lastAnswered);
+  }
+  return true;
+}
 
 // ============================================================
-// QUESTIONNAIRE UI
+// LANDING BUTTONS
 // ============================================================
-document.getElementById('beginBtn').onclick = async () => {
-  if (!state.email) {
-    openAuthModal('save');
-    return;
+document.getElementById('beginBtn').onclick = () => {
+  if (state.email) {
+    // Already know them (e.g., returning on same device)
+    startQuestionnaire();
+  } else {
+    openEmailModal();
   }
-  startQuestionnaire();
 };
 
+document.getElementById('resumeBtn').onclick = openResumeModal;
+document.getElementById('heroResumeBtn').onclick = openResumeModal;
+
+// ============================================================
+// QUESTIONNAIRE
+// ============================================================
 function startQuestionnaire() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('questionnaire').classList.add('active');
@@ -774,13 +633,12 @@ function renderStep() {
   container.innerHTML = `
     <div class="step active">
       <div class="step-eyebrow"><span class="dot"></span> ${q.eyebrow}</div>
-      <h2>${q.title}</h2>
+      <h2>${q.title} <span class="optional-tag">Optional</span></h2>
       <p class="helper">${q.helper}</p>
       ${inputHtml}
     </div>
   `;
 
-  // bind input listeners
   if (q.type === 'text' || q.type === 'textarea') {
     const input = document.getElementById('input_' + q.key);
     input.focus();
@@ -794,20 +652,22 @@ function renderStep() {
     bindContactFields();
   }
 
-  // nav button states
   document.getElementById('prevBtn').disabled = state.currentStep === 0;
   const nextBtn = document.getElementById('nextBtn');
+  const skipBtn = document.getElementById('skipBtn');
   if (state.currentStep === QUESTIONS.length - 1) {
     nextBtn.innerHTML = 'Submit responses <span class="arrow">&rarr;</span>';
+    skipBtn.style.display = 'none';
   } else {
     nextBtn.innerHTML = 'Continue <span class="arrow">&rarr;</span>';
+    skipBtn.style.display = 'inline-flex';
   }
 }
 
 function renderPhotoUploader() {
   return `
     <div class="field">
-      <label>Upload photos (optional, max 4)</label>
+      <label>Upload photos (max 4)</label>
       <label for="photoInput" class="photo-drop" id="photoDrop">
         <div class="icon">+</div>
         <div class="prim">Click or drag to upload</div>
@@ -822,6 +682,7 @@ function renderPhotoUploader() {
 function bindPhotoUploader() {
   const drop = document.getElementById('photoDrop');
   const input = document.getElementById('photoInput');
+  if (!drop || !input) return;
 
   ['dragenter','dragover'].forEach(e => drop.addEventListener(e, ev => {
     ev.preventDefault(); drop.classList.add('dragover');
@@ -829,12 +690,8 @@ function bindPhotoUploader() {
   ['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => {
     ev.preventDefault(); drop.classList.remove('dragover');
   }));
-  drop.addEventListener('drop', ev => {
-    handleFiles(ev.dataTransfer.files);
-  });
-  input.addEventListener('change', ev => {
-    handleFiles(ev.target.files);
-  });
+  drop.addEventListener('drop', ev => { handleFiles(ev.dataTransfer.files); });
+  input.addEventListener('change', ev => { handleFiles(ev.target.files); });
 
   renderPhotoPreviews();
 }
@@ -848,14 +705,11 @@ async function handleFiles(files) {
       continue;
     }
 
-    // upload to Supabase storage
     const ext = file.name.split('.').pop();
-    const path = `${state.email}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const safeEmail = (state.email || 'anon').replace(/[^a-z0-9]/g, '_');
+    const path = `${safeEmail}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
     const { error } = await sb.storage.from('business-photos').upload(path, file);
-    if (error) {
-      alert('Upload failed: ' + error.message);
-      continue;
-    }
+    if (error) { alert('Upload failed: ' + error.message); continue; }
     const { data: pub } = sb.storage.from('business-photos').getPublicUrl(path);
     state.photos.push({ url: pub.publicUrl, path, caption: '' });
     renderPhotoPreviews();
@@ -912,28 +766,23 @@ function bindContactFields() {
 }
 
 function escapeHtml(s) {
-  return String(s || '').replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  })[ch]);
+  return String(s || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]);
 }
 
 // ============================================================
 // NAVIGATION
 // ============================================================
 document.getElementById('prevBtn').onclick = () => {
-  if (state.currentStep > 0) { state.currentStep--; renderStep(); }
+  if (state.currentStep > 0) { state.currentStep--; renderStep(); window.scrollTo({top:0, behavior:'smooth'}); }
+};
+
+document.getElementById('skipBtn').onclick = () => {
+  state.currentStep++;
+  renderStep();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 document.getElementById('nextBtn').onclick = async () => {
-  // require basics fields
-  const q = QUESTIONS[state.currentStep];
-  if (q.key === 'owner_name' || q.key === 'business_name' || q.key === 'one_liner') {
-    if (!state.answers[q.key] || state.answers[q.key].trim().length < 1) {
-      alert('Please fill in this field to continue.');
-      return;
-    }
-  }
-
   if (state.currentStep === QUESTIONS.length - 1) {
     await submitFinal();
   } else {
@@ -954,8 +803,15 @@ function scheduleSave() {
   state.saveTimer = setTimeout(saveProgress, 800);
 }
 
-async function saveProgress() {
-  if (!state.email) return;
+async function saveProgress(force = false) {
+  saveLocal();
+  const status = document.getElementById('saveStatus');
+
+  if (!state.email) {
+    status.textContent = 'Saved on device';
+    return;
+  }
+
   const payload = {
     email: state.email,
     owner_name: state.answers.owner_name || null,
@@ -973,7 +829,6 @@ async function saveProgress() {
     if (result.data) state.submissionId = result.data.id;
   }
 
-  const status = document.getElementById('saveStatus');
   if (result.error) {
     status.textContent = 'Save failed';
     console.error(result.error);
@@ -994,32 +849,44 @@ async function submitFinal() {
     .update({ status: 'submitted', submitted_at: new Date().toISOString() })
     .eq('id', state.submissionId);
   if (error) { alert('Submit failed: ' + error.message); return; }
+  clearLocal();
   showSuccess();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('appToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 // ============================================================
 // BOOT
 // ============================================================
 (async () => {
-  // Handle magic link returns
-  const hash = window.location.hash;
-  if (hash && hash.includes('access_token')) {
-    // supabase-js picks this up automatically
-    await new Promise(r => setTimeout(r, 500));
-  }
+  // Try restoring from local draft (same device, same browser)
+  const local = loadLocal();
+  if (local && local.email) {
+    state.email = local.email;
+    state.answers = local.answers || {};
+    state.contact = local.contact || {};
+    state.photos = local.photos || [];
+    state.currentStep = local.currentStep || 0;
+    state.submissionId = local.submissionId || null;
 
-  await checkAuth();
+    // Pull fresh from server (in case they were on another device)
+    await loadServerSubmission(state.email);
+    updateHeaderSession();
 
-  // If returning with a session and progress exists, skip straight into questionnaire
-  if (state.email && Object.keys(state.answers).length > 0) {
-    startQuestionnaire();
-  }
-
-  sb.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' && !state.email) {
-      location.reload();
+    if (state.submissionAlreadyFinalized) {
+      showSuccess();
+    } else if (Object.keys(state.answers).length > 0) {
+      startQuestionnaire();
     }
-  });
+  }
 })();
 </script>
 </body>
