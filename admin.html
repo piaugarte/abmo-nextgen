@@ -52,9 +52,9 @@
   .sub-card .owner { font-size: 12px; color: var(--ink-mute); margin-bottom: 8px; }
   .sub-card .meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
   .badge { padding: 2px 10px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; border-radius: 999px; }
-  .badge.draft { background: rgba(122,111,97,0.2); color: var(--ink-mute); }
-  .badge.submitted { background: rgba(200,148,52,0.2); color: var(--gold); }
-  .badge.published { background: rgba(90,122,62,0.2); color: var(--green); }
+  .badge.new { background: rgba(200,148,52,0.2); color: var(--gold); }
+  .badge.cleaned { background: rgba(122,111,97,0.2); color: var(--ink-soft); }
+  .badge.live { background: rgba(90,122,62,0.2); color: var(--green); }
   .sub-card .time { color: var(--ink-mute); }
 
   main.content { padding: 32px 40px; max-height: 100vh; overflow-y: auto; }
@@ -154,9 +154,9 @@
 
     <div class="filter-tabs">
       <button class="active" data-filter="all">All</button>
-      <button data-filter="submitted">New</button>
-      <button data-filter="draft">Drafts</button>
-      <button data-filter="published">Live</button>
+      <button data-filter="new">New</button>
+      <button data-filter="cleaned">Cleaned</button>
+      <button data-filter="live">Live</button>
     </div>
 
     <div class="submission-list" id="submissionList">
@@ -317,23 +317,39 @@ function hydrateProfile(rawProf) {
   return rawProf;
 }
 
+// Derive the display state of a submission from its data:
+//   'live'    = a profile exists AND it's been marked published
+//   'cleaned' = a profile exists (cleanup has been run)
+//   'new'     = no profile yet (never cleaned up)
+function submissionState(s) {
+  const prof = adminState.profiles[s.id];
+  if (!prof) return 'new';
+  if (prof.published) return 'live';
+  return 'cleaned';
+}
+
 function renderList() {
   const list = document.getElementById('submissionList');
-  const filtered = adminState.submissions.filter(s => adminState.filter === 'all' ? true : s.status === adminState.filter);
+  const filtered = adminState.submissions.filter(s => {
+    if (adminState.filter === 'all') return true;
+    return submissionState(s) === adminState.filter;
+  });
   if (filtered.length === 0) {
-    list.innerHTML = '<div style="padding:16px 0;color:var(--ink-mute);font-size:13px;text-align:center;">No submissions yet.</div>';
+    list.innerHTML = '<div style="padding:16px 0;color:var(--ink-mute);font-size:13px;text-align:center;">No submissions in this view.</div>';
     return;
   }
-  list.innerHTML = filtered.map(s => `
+  list.innerHTML = filtered.map(s => {
+    const state = submissionState(s);
+    return `
     <div class="sub-card ${adminState.selected?.id === s.id ? 'active' : ''}" onclick="selectSubmission('${s.id}')">
       <div class="name">${escapeHtml(s.business_name || 'Untitled business')}</div>
       <div class="owner">${escapeHtml(s.owner_name || '—')} &middot; ${escapeHtml(s.email)}</div>
       <div class="meta-row">
-        <span class="badge ${s.status}">${s.status}</span>
+        <span class="badge ${state}">${state}</span>
         <span class="time">${timeAgo(s.updated_at)}</span>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 document.querySelectorAll('.filter-tabs button').forEach(b => {
@@ -362,13 +378,18 @@ function renderDetail() {
   document.getElementById('dBusiness').textContent = s.business_name || 'Untitled business';
   document.getElementById('dOwner').textContent = `${s.owner_name || '—'} · ${s.email}`;
 
-  const hasProfile = !!adminState.profiles[s.id];
+  const prof = adminState.profiles[s.id];
+  const hasProfile = !!prof;
+  const isLive = hasProfile && prof.published;
   document.getElementById('dActions').innerHTML = `
     <button class="btn" onclick="cleanUpAnswers()" id="cleanBtn">
       ${hasProfile ? 'Re-run cleanup' : 'Clean up answers'}
     </button>
-    ${hasProfile && !adminState.profiles[s.id].published
-      ? '<button class="btn btn-accent" onclick="publishProfile()">Publish</button>' : ''}
+    ${hasProfile
+      ? (isLive
+          ? '<button class="btn" onclick="toggleLive(false)">Unmark live</button>'
+          : '<button class="btn btn-accent" onclick="toggleLive(true)">Mark as live</button>')
+      : ''}
   `;
   renderAnswersTab();
   renderProfileTab();
@@ -582,19 +603,21 @@ window.cleanUpAnswers = async () => {
 };
 
 // ============================================================
-// PUBLISH
+// MARK AS LIVE / UNMARK
+// Toggles the `published` flag on the profile. Content stays editable.
 // ============================================================
-window.publishProfile = async () => {
+window.toggleLive = async (makeLive) => {
   const s = adminState.selected;
   const prof = adminState.profiles[s.id];
-  const { error } = await sb.from('profiles').update({ published: true }).eq('id', prof.id);
-  if (error) { toast('Publish failed'); return; }
-  prof.published = true;
-  await sb.from('submissions').update({ status: 'published' }).eq('id', s.id);
-  s.status = 'published';
+  const { error } = await sb.from('profiles').update({ published: makeLive }).eq('id', prof.id);
+  if (error) { toast('Update failed: ' + error.message); return; }
+  prof.published = makeLive;
+  // Keep submissions.status roughly in sync for back-compat
+  await sb.from('submissions').update({ status: makeLive ? 'published' : 'draft' }).eq('id', s.id);
+  s.status = makeLive ? 'published' : 'draft';
   renderList();
   renderDetail();
-  toast('Published');
+  toast(makeLive ? 'Marked as live' : 'Unmarked live');
 };
 
 // ============================================================
