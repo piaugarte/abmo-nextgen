@@ -7,7 +7,7 @@
 <title>Admin &mdash; Family Spotlight</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <style>
@@ -20,8 +20,8 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Inter', sans-serif; background: var(--paper); color: var(--ink); font-size: 14px; line-height: 1.5; min-height: 100vh; }
   .display { font-family: 'Fraunces', serif; }
-  .mono { font-family: 'JetBrains Mono', monospace; }
 
+  /* GATE */
   .gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
   .gate-card { max-width: 400px; width: 100%; padding: 48px 40px; background: var(--paper); border: 1px solid var(--ink); border-radius: 14px; }
   .gate-card h1 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 32px; letter-spacing: -0.02em; margin-bottom: 8px; }
@@ -32,6 +32,7 @@
   .gate-card button:hover { background: var(--accent); }
   .gate-card .err { color: var(--accent); font-size: 13px; margin-top: 12px; }
 
+  /* APP LAYOUT */
   .app { display: none; min-height: 100vh; }
   .app.active { display: grid; grid-template-columns: 340px 1fr; }
 
@@ -60,6 +61,7 @@
   .empty-state { display: flex; align-items: center; justify-content: center; height: 100%; text-align: center; color: var(--ink-mute); }
   .empty-state .inner { max-width: 320px; font-family: 'Fraunces', serif; font-size: 20px; font-style: italic; }
 
+  /* DETAIL */
   .detail .header { padding-bottom: 24px; border-bottom: 1px solid rgba(31,27,22,0.15); margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
   .detail h1 { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 400; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 6px; }
   .detail .owner { color: var(--ink-mute); font-size: 14px; }
@@ -71,6 +73,7 @@
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
+  /* ANSWERS (raw) view */
   .qa-block { margin-bottom: 28px; }
   .qa-block .q { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px; }
   .qa-block .a { font-family: 'Fraunces', serif; font-size: 17px; line-height: 1.6; white-space: pre-wrap; padding: 12px 16px; background: var(--paper-deep); border-left: 2px solid var(--accent); border-radius: 0 8px 8px 0; }
@@ -78,6 +81,20 @@
   .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 12px; }
   .photos-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
 
+  /* SECTION HEADER in profile copy */
+  .section-header {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: -0.01em;
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(31,27,22,0.2);
+    color: var(--ink);
+  }
+  .section-header:first-child { margin-top: 0; }
+
+  /* BUTTONS */
   .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid var(--ink); background: transparent; cursor: pointer; font-family: inherit; font-weight: 500; border-radius: 999px; }
   .btn:hover { background: var(--ink); color: var(--paper); }
   .btn-primary { background: var(--ink); color: var(--paper); }
@@ -88,35 +105,34 @@
 
   .actions-bar { display: flex; gap: 10px; flex-wrap: wrap; }
 
-  .editor-field { margin-bottom: 20px; }
-  .editor-field label { display: block; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px; font-weight: 500; }
-  .editor-field input, .editor-field textarea { width: 100%; padding: 10px 14px; border: 1px solid rgba(31,27,22,0.2); background: #fff; font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.5; color: var(--ink); resize: vertical; border-radius: 8px; }
-  .editor-field textarea { min-height: 100px; }
-  .editor-field input:focus, .editor-field textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+  /* PROFILE COPY (editable) */
+  .copy-field { margin-bottom: 20px; }
+  .copy-field label {
+    display: block; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 6px; font-weight: 500;
+  }
+  .copy-field input, .copy-field textarea {
+    width: 100%; padding: 12px 14px; border: 1px solid rgba(31,27,22,0.2);
+    background: #fff; font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.6;
+    color: var(--ink); resize: vertical; border-radius: 8px;
+  }
+  .copy-field textarea { min-height: 80px; }
+  .copy-field input:focus, .copy-field textarea:focus {
+    outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent;
+  }
 
-  .section-editor { padding: 16px; background: var(--paper-deep); margin-bottom: 12px; position: relative; border-radius: 10px; }
-  .section-editor .rm-section { position: absolute; top: 10px; right: 10px; background: transparent; border: none; cursor: pointer; color: var(--ink-mute); font-size: 18px; line-height: 1; }
-  .section-editor .rm-section:hover { color: var(--accent); }
+  .empty-profile {
+    color: var(--ink-mute); font-family: 'Fraunces', serif;
+    font-size: 17px; font-style: italic; padding: 40px 0;
+    line-height: 1.6;
+  }
 
-  .add-btn { width: 100%; padding: 12px; background: transparent; border: 1px dashed rgba(31,27,22,0.3); color: var(--ink-mute); cursor: pointer; font-family: inherit; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 10px; }
-  .add-btn:hover { border-color: var(--ink); color: var(--ink); }
-
-  .preview-frame { width: 100%; height: 900px; border: 1px solid rgba(31,27,22,0.25); background: #fff; border-radius: 10px; }
-
+  /* TOAST & MISC */
   .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 24px; background: var(--ink); color: var(--paper); font-size: 13px; z-index: 100; transform: translateY(200%); transition: transform 0.3s; border-radius: 999px; }
   .toast.show { transform: translateY(0); }
 
   .spinner { display: inline-block; width: 12px; height: 12px; border: 1.5px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .modal-overlay { position: fixed; inset: 0; background: rgba(31,27,22,0.6); display: none; align-items: center; justify-content: center; z-index: 200; padding: 24px; backdrop-filter: blur(4px); }
-  .modal-overlay.active { display: flex; }
-  .modal-box { background: var(--paper); max-width: 880px; width: 100%; max-height: 92vh; padding: 32px; overflow-y: auto; position: relative; border-radius: 16px; }
-  .modal-box pre { background: #1f1b16; color: #f4ede2; padding: 16px; overflow: auto; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.5; max-height: 500px; border-radius: 10px; }
-
-  .export-tabs { display: flex; gap: 4px; margin-bottom: 16px; padding-bottom: 0; border-bottom: 1px solid rgba(31,27,22,0.15); }
-  .export-tabs button { padding: 10px 16px; background: transparent; border: none; cursor: pointer; font-family: inherit; font-size: 13px; color: var(--ink-mute); border-bottom: 2px solid transparent; margin-bottom: -1px; }
-  .export-tabs button.active { color: var(--ink); border-bottom-color: var(--accent); font-weight: 500; }
 </style>
 </head>
 <body>
@@ -150,7 +166,7 @@
 
   <main class="content">
     <div class="empty-state" id="emptyState">
-      <div class="inner">&ldquo;Select a submission from the left to review, edit, and publish.&rdquo;</div>
+      <div class="inner">&ldquo;Select a submission from the left to review and edit.&rdquo;</div>
     </div>
 
     <div class="detail" id="detail" style="display:none;">
@@ -163,59 +179,80 @@
       </div>
 
       <div class="tabs">
-        <button class="active" data-tab="answers">Answers</button>
+        <button class="active" data-tab="answers">Raw Answers</button>
         <button data-tab="profile">Profile Copy</button>
-        <button data-tab="preview">Preview</button>
       </div>
 
       <div class="tab-content active" id="tab-answers"></div>
       <div class="tab-content" id="tab-profile"></div>
-      <div class="tab-content" id="tab-preview"></div>
     </div>
   </main>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<div class="modal-overlay" id="exportModal">
-  <div class="modal-box">
-    <h2 class="display" style="font-weight:400; font-size:26px; margin-bottom:8px;">Exported HTML</h2>
-    <p style="color: var(--ink-mute); margin-bottom: 16px; font-size: 14px;">
-      <strong>Content block</strong> is the profile only &mdash; paste into your Framer/CMS page.
-      <strong>Standalone page</strong> is a full HTML file ready to host anywhere.
-    </p>
-    <div class="export-tabs">
-      <button class="active" id="exportTabBlock">Content block</button>
-      <button id="exportTabStandalone">Standalone page</button>
-    </div>
-    <div style="display:flex; gap:10px; margin: 16px 0; flex-wrap: wrap;">
-      <button class="btn btn-primary" id="copyHtml">Copy to clipboard</button>
-      <button class="btn" id="downloadHtml">Download .html</button>
-      <button class="btn" id="closeExport">Close</button>
-    </div>
-    <pre id="exportPre"></pre>
-  </div>
-</div>
-
 <script>
 const cfg = window.APP_CONFIG;
 const sb = supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
 let adminState = { submissions: [], selected: null, filter: 'all', profiles: {} };
-let exportMode = 'block';
 
-const Q_MAP = {
-  owner_name: "Owner name", first_name: "First name", middle_name: "Middle name", last_name: "Last name",
-  business_name: "Business name", one_liner: "In one sentence",
-  intro: "Introduce yourself and your business", inspiration: "What inspired you to start",
-  purpose: "What the business is really about", hopes: "What you hope family takes away",
-  support: "How family can best support you", routine: "A part of your daily routine",
-  challenge: "A challenge you've overcome", win: "A small win you're proud of",
-  lesson: "A lesson you wish you'd known earlier", principle: "A principle that's helped you succeed",
-  advice: "Advice to the next generation", open_to: "Open to mentorship or internships?",
-};
+// ============================================================
+// QUESTIONNAIRE STRUCTURE
+// This must match index.html. Used to label and group answers.
+// ============================================================
+const SECTIONS = [
+  {
+    title: "The basics",
+    questions: [
+      { key: "business_name",  label: "What is your business called?", type: "short" },
+      { key: "one_liner",      label: "Describe your business in a sentence.", type: "short" },
+    ],
+  },
+  {
+    title: "Spotlight interview",
+    questions: [
+      { key: "intro",          label: "Introduce yourself." },
+      { key: "inspiration",    label: "What inspired this venture?" },
+      { key: "purpose",        label: "What is this business really about?" },
+      { key: "hopes",          label: "What do you hope younger family members learn from your story?" },
+      { key: "support",        label: "How can our family best support your business?" },
+    ],
+  },
+  {
+    title: "A day in the life",
+    questions: [
+      { key: "routine",        label: "Walk us through a slice of your routine." },
+      { key: "challenge",      label: "Share a challenge you've overcome." },
+      { key: "win",            label: "Share a small win." },
+    ],
+  },
+  {
+    title: "Lessons & advice",
+    questions: [
+      { key: "lesson",         label: "What do you wish you'd known earlier?" },
+      { key: "principle",      label: "What principle has shaped your success?" },
+      { key: "advice",         label: "Advice for the next generation." },
+    ],
+  },
+  {
+    title: "Mentorship & contact",
+    questions: [
+      { key: "open_to",        label: "Are you open to mentoring a younger family member?" },
+    ],
+  },
+];
 
+// Flat map for looking up question labels by key
+const Q_LABEL_BY_KEY = {};
+SECTIONS.forEach(sec => sec.questions.forEach(q => { Q_LABEL_BY_KEY[q.key] = q.label; }));
+
+// Which keys are "long form" — the ones we send to AI for cleanup
+const CLEANABLE_KEYS = ['one_liner', 'intro', 'inspiration', 'purpose', 'hopes', 'support', 'routine', 'challenge', 'win', 'lesson', 'principle', 'advice', 'open_to'];
+
+// ============================================================
 // GATE
+// ============================================================
 document.getElementById('enterBtn').onclick = tryEnter;
 document.getElementById('pwd').addEventListener('keypress', e => { if (e.key === 'Enter') tryEnter(); });
 
@@ -245,35 +282,38 @@ function boot() {
 
 if (sessionStorage.getItem('admin_ok') === '1') boot();
 
+// ============================================================
 // LOAD
+// ============================================================
 async function loadSubmissions() {
   const { data, error } = await sb.from('submissions').select('*').order('updated_at', { ascending: false });
   if (error) {
-    document.getElementById('submissionList').innerHTML = `<div style="color:var(--accent);font-size:13px;padding:16px 0;">Error: ${error.message}</div>`;
+    document.getElementById('submissionList').innerHTML =
+      `<div style="color:var(--accent);font-size:13px;padding:16px 0;">Error: ${error.message}</div>`;
     return;
   }
   adminState.submissions = data || [];
+
   const { data: profs } = await sb.from('profiles').select('*');
   (profs || []).forEach(p => { adminState.profiles[p.submission_id] = hydrateProfile(p); });
+
   renderList();
 }
 
+// Make sure a profile has a `cleaned` object (migrates old shapes away quietly)
 function hydrateProfile(rawProf) {
   if (!rawProf) return rawProf;
-  const s = Array.isArray(rawProf.sections) ? rawProf.sections : [];
-  const gazetteEntry = s.find(x => x && x._gazette);
-  if (gazetteEntry) {
-    rawProf.role = gazetteEntry.role || 'Founder';
-    rawProf.location = gazetteEntry.location || '';
-    rawProf.cards = gazetteEntry.cards || { origin: [], speed: [], lessons: [] };
-  } else {
-    rawProf.role = rawProf.role || 'Founder';
-    rawProf.location = rawProf.location || '';
-    rawProf.cards = { origin: [], speed: [], lessons: [] };
+
+  // Try to get cleaned answers from anywhere in the existing data
+  let cleaned = {};
+
+  // Preferred: profile.sections[0].cleaned (new shape)
+  if (Array.isArray(rawProf.sections)) {
+    const entry = rawProf.sections.find(x => x && x._cleaned_v1);
+    if (entry && entry.cleaned) cleaned = entry.cleaned;
   }
-  if (!rawProf.cards.origin) rawProf.cards.origin = [];
-  if (!rawProf.cards.speed) rawProf.cards.speed = [];
-  if (!rawProf.cards.lessons) rawProf.cards.lessons = [];
+
+  rawProf.cleaned = cleaned;
   return rawProf;
 }
 
@@ -307,10 +347,13 @@ document.querySelectorAll('.filter-tabs button').forEach(b => {
 
 window.selectSubmission = (id) => {
   adminState.selected = adminState.submissions.find(s => s.id === id);
-  renderList(); renderDetail();
+  renderList();
+  renderDetail();
 };
 
+// ============================================================
 // DETAIL
+// ============================================================
 function renderDetail() {
   const s = adminState.selected;
   if (!s) return;
@@ -321,16 +364,14 @@ function renderDetail() {
 
   const hasProfile = !!adminState.profiles[s.id];
   document.getElementById('dActions').innerHTML = `
-    <button class="btn" onclick="generateProfile()" id="genBtn">
-      ${hasProfile ? 'Regenerate draft' : 'Generate profile draft'}
+    <button class="btn" onclick="cleanUpAnswers()" id="cleanBtn">
+      ${hasProfile ? 'Re-run cleanup' : 'Clean up answers'}
     </button>
-    ${hasProfile ? '<button class="btn btn-primary" onclick="exportProfile()">Export HTML</button>' : ''}
     ${hasProfile && !adminState.profiles[s.id].published
       ? '<button class="btn btn-accent" onclick="publishProfile()">Publish</button>' : ''}
   `;
   renderAnswersTab();
   renderProfileTab();
-  renderPreviewTab();
 }
 
 document.querySelectorAll('.tabs button').forEach(btn => {
@@ -339,36 +380,65 @@ document.querySelectorAll('.tabs button').forEach(btn => {
     document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    if (btn.dataset.tab === 'preview') renderPreviewTab();
   };
 });
 
+// ============================================================
+// RAW ANSWERS TAB
+// ============================================================
 function renderAnswersTab() {
   const s = adminState.selected;
   const a = s.answers || {};
   const photos = s.photos || [];
+
   let html = '';
-  Object.keys(Q_MAP).forEach(key => {
-    if (a[key]) {
-      html += `<div class="qa-block"><div class="q">${Q_MAP[key]}</div><div class="a">${escapeHtml(a[key])}</div></div>`;
+
+  // Owner name + business name at the top
+  if (s.owner_name) {
+    html += `<div class="qa-block"><div class="q">Owner name</div><div class="a">${escapeHtml(s.owner_name)}</div></div>`;
+  }
+  if (s.business_name) {
+    html += `<div class="qa-block"><div class="q">Business name</div><div class="a">${escapeHtml(s.business_name)}</div></div>`;
+  }
+
+  // All questionnaire answers grouped by section
+  SECTIONS.forEach(sec => {
+    let sectionHtml = '';
+    sec.questions.forEach(q => {
+      if (q.key === 'business_name') return; // already shown
+      const val = a[q.key];
+      if (val && String(val).trim().length > 0) {
+        sectionHtml += `<div class="qa-block"><div class="q">${escapeHtml(q.label)}</div><div class="a">${escapeHtml(val)}</div></div>`;
+      }
+    });
+    if (sectionHtml) {
+      html += `<h2 class="section-header">${escapeHtml(sec.title)}</h2>${sectionHtml}`;
     }
   });
+
+  // Contact
   if (a.contact && (a.contact.email || a.contact.website || a.contact.instagram || a.contact.other)) {
-    html += `<div class="qa-block"><div class="q">Contact</div><div class="a">${[
+    html += `<h2 class="section-header">Contact</h2><div class="qa-block"><div class="a">${[
       a.contact.email && 'Email: ' + a.contact.email,
       a.contact.website && 'Web: ' + a.contact.website,
       a.contact.instagram && 'IG: ' + a.contact.instagram,
       a.contact.other && a.contact.other,
     ].filter(Boolean).join('\n')}</div></div>`;
   }
+
+  // Photos
   if (photos.length > 0) {
-    html += `<div class="qa-block"><div class="q">Photos</div><div class="photos-grid">
+    html += `<h2 class="section-header">Photos</h2><div class="photos-grid">
       ${photos.map(p => `<img src="${p.url}" alt="">`).join('')}
-    </div></div>`;
+    </div>`;
   }
+
   document.getElementById('tab-answers').innerHTML = html || '<p style="color:var(--ink-mute);">No answers yet.</p>';
 }
 
+// ============================================================
+// PROFILE COPY TAB (editable, grouped by section)
+// ============================================================
 function renderProfileTab() {
   const s = adminState.selected;
   const prof = adminState.profiles[s.id];
@@ -376,181 +446,144 @@ function renderProfileTab() {
 
   if (!prof) {
     container.innerHTML = `
-      <p style="color: var(--ink-mute); font-family:'Fraunces',serif; font-size:17px; font-style:italic; padding: 40px 0;">
-        No profile draft yet. Click <strong>Generate profile draft</strong> above to have AI structure the answers into the Gazette layout (Origin Story / Speed Round / Lessons &amp; Advice cards).
+      <p class="empty-profile">
+        No cleaned-up copy yet. Click <strong>Clean up answers</strong> above and AI will lightly edit each answer &mdash; fixing grammar, typos, and awkward phrasing, while keeping the writer's voice.
       </p>`;
     return;
   }
 
-  container.innerHTML = `
-    <div class="editor-field"><label>Business name</label>
-      <input type="text" id="e_business_name" value="${escapeHtml(prof.business_name || '')}" /></div>
-    <div class="editor-field"><label>Owner name</label>
-      <input type="text" id="e_owner_name" value="${escapeHtml(prof.owner_name || '')}" /></div>
-    <div class="editor-field"><label>Role (e.g. Founder, Owner &amp; CEO)</label>
-      <input type="text" id="e_role" value="${escapeHtml(prof.role || 'Founder')}" /></div>
-    <div class="editor-field"><label>Location (City, Country)</label>
-      <input type="text" id="e_location" value="${escapeHtml(prof.location || '')}" /></div>
-    <div class="editor-field"><label>Tagline / dek (italic subtitle, under 25 words)</label>
-      <textarea id="e_tagline" rows="2">${escapeHtml(prof.tagline || '')}</textarea></div>
-    <div class="editor-field"><label>Hero image URL</label>
-      <input type="text" id="e_hero_image" value="${escapeHtml(prof.hero_image || '')}" /></div>
+  const cleaned = prof.cleaned || {};
+  let html = '';
 
-    <h3 class="display" style="font-weight:400;font-size:20px;margin:28px 0 10px;">Card 1 &mdash; Origin Story / Overview</h3>
-    <div id="cardOriginEditor"></div>
-    <button class="add-btn" onclick="addQA('origin')">+ Add Q&amp;A to Origin Story</button>
-
-    <h3 class="display" style="font-weight:400;font-size:20px;margin:32px 0 10px;">Card 2 &mdash; Speed Round (day-in-the-life)</h3>
-    <div id="cardSpeedEditor"></div>
-    <button class="add-btn" onclick="addQA('speed')">+ Add Q&amp;A to Speed Round</button>
-
-    <h3 class="display" style="font-weight:400;font-size:20px;margin:32px 0 10px;">Card 3 &mdash; Lessons &amp; Advice</h3>
-    <div id="cardLessonsEditor"></div>
-    <button class="add-btn" onclick="addQA('lessons')">+ Add Q&amp;A to Lessons &amp; Advice</button>
-
-    <h3 class="display" style="font-weight:400;font-size:20px;margin:32px 0 14px;">Contact</h3>
-    <div class="editor-field"><label>Website</label>
-      <input type="text" id="e_contact_website" value="${escapeHtml(prof.contact?.website || '')}" /></div>
-    <div class="editor-field"><label>Facebook URL</label>
-      <input type="text" id="e_contact_facebook" value="${escapeHtml(prof.contact?.facebook || '')}" /></div>
-    <div class="editor-field"><label>Instagram (@handle or full URL)</label>
-      <input type="text" id="e_contact_instagram" value="${escapeHtml(prof.contact?.instagram || '')}" /></div>
-    <div class="editor-field"><label>TikTok (@handle or full URL)</label>
-      <input type="text" id="e_contact_tiktok" value="${escapeHtml(prof.contact?.tiktok || '')}" /></div>
-    <div class="editor-field"><label>Public email</label>
-      <input type="text" id="e_contact_email" value="${escapeHtml(prof.contact?.email || '')}" /></div>
-
-    <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(31,27,22,0.15); display:flex; gap:10px; flex-wrap: wrap;">
-      <button class="btn btn-primary" onclick="saveProfile()">Save changes</button>
-      <button class="btn" onclick="saveAndPreview()">Save &amp; preview</button>
-    </div>
-  `;
-  renderCardEditors();
-}
-
-function renderCardEditors() {
-  const s = adminState.selected;
-  const prof = adminState.profiles[s.id];
-  ['origin', 'speed', 'lessons'].forEach(cardKey => {
-    const wrap = document.getElementById('card' + cardKey.charAt(0).toUpperCase() + cardKey.slice(1) + 'Editor');
-    if (!wrap) return;
-    const items = prof.cards[cardKey] || [];
-    wrap.innerHTML = items.map((qa, i) => `
-      <div class="section-editor">
-        <button class="rm-section" onclick="removeQA('${cardKey}', ${i})" title="Remove">&times;</button>
-        <div class="editor-field"><label>Question</label>
-          <input type="text" data-card="${cardKey}" data-qa-q="${i}" value="${escapeHtml(qa.q || '')}" /></div>
-        <div class="editor-field"><label>Answer (use blank line for paragraph breaks)</label>
-          <textarea data-card="${cardKey}" data-qa-a="${i}" rows="6">${escapeHtml(qa.a || '')}</textarea></div>
-      </div>
-    `).join('') || '<p style="color:var(--ink-mute);font-size:13px;font-style:italic;padding:8px 0 12px;">No Q&amp;A yet. Click the button below to add one.</p>';
-  });
-}
-
-window.addQA = (cardKey) => {
-  const s = adminState.selected;
-  const prof = adminState.profiles[s.id];
-  syncCardsFromUI(prof);
-  prof.cards[cardKey].push({ q: '', a: '' });
-  renderCardEditors();
-};
-
-window.removeQA = (cardKey, i) => {
-  const s = adminState.selected;
-  const prof = adminState.profiles[s.id];
-  syncCardsFromUI(prof);
-  prof.cards[cardKey].splice(i, 1);
-  renderCardEditors();
-};
-
-function syncCardsFromUI(prof) {
-  ['origin', 'speed', 'lessons'].forEach(cardKey => {
-    const items = [];
-    const qNodes = document.querySelectorAll(`[data-card="${cardKey}"][data-qa-q]`);
-    qNodes.forEach(qEl => {
-      const i = qEl.dataset.qaQ;
-      const aEl = document.querySelector(`[data-card="${cardKey}"][data-qa-a="${i}"]`);
-      if (qEl && aEl) items.push({ q: qEl.value, a: aEl.value });
+  SECTIONS.forEach(sec => {
+    let sectionHtml = '';
+    sec.questions.forEach(q => {
+      // Only show the question in profile copy if it was cleanable AND has content
+      if (!CLEANABLE_KEYS.includes(q.key)) {
+        // Non-cleanable short fields (business_name) — pull from submission
+        const raw = s.answers?.[q.key] || s[q.key] || '';
+        if (!raw) return;
+        sectionHtml += `
+          <div class="copy-field">
+            <label>${escapeHtml(q.label)}</label>
+            <input type="text" data-field-key="${q.key}" value="${escapeHtml(raw)}" />
+          </div>`;
+      } else {
+        const val = cleaned[q.key] ?? s.answers?.[q.key] ?? '';
+        if (!val && !cleaned[q.key]) return; // skip empty ones entirely
+        const rows = q.type === 'short' ? 2 : 6;
+        sectionHtml += `
+          <div class="copy-field">
+            <label>${escapeHtml(q.label)}</label>
+            <textarea data-field-key="${q.key}" rows="${rows}">${escapeHtml(val)}</textarea>
+          </div>`;
+      }
     });
-    prof.cards[cardKey] = items;
+    if (sectionHtml) {
+      html += `<h2 class="section-header">${escapeHtml(sec.title)}</h2>${sectionHtml}`;
+    }
   });
+
+  html += `
+    <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(31,27,22,0.15); display:flex; gap:10px; flex-wrap: wrap;">
+      <button class="btn btn-primary" onclick="saveProfile()">Save changes</button>
+    </div>`;
+
+  container.innerHTML = html;
 }
 
 window.saveProfile = async () => {
   const s = adminState.selected;
   const prof = adminState.profiles[s.id];
-  syncCardsFromUI(prof);
-  prof.business_name = document.getElementById('e_business_name').value;
-  prof.owner_name = document.getElementById('e_owner_name').value;
-  prof.role = document.getElementById('e_role').value;
-  prof.location = document.getElementById('e_location').value;
-  prof.tagline = document.getElementById('e_tagline').value;
-  prof.hero_image = document.getElementById('e_hero_image').value;
-  prof.contact = {
-    website: document.getElementById('e_contact_website').value,
-    facebook: document.getElementById('e_contact_facebook').value,
-    instagram: document.getElementById('e_contact_instagram').value,
-    tiktok: document.getElementById('e_contact_tiktok').value,
-    email: document.getElementById('e_contact_email').value,
+
+  // Collect every edited field
+  const editedCleaned = {};
+  const editedShort = {};
+  document.querySelectorAll('[data-field-key]').forEach(el => {
+    const k = el.dataset.fieldKey;
+    if (CLEANABLE_KEYS.includes(k)) {
+      editedCleaned[k] = el.value;
+    } else {
+      editedShort[k] = el.value;
+    }
+  });
+
+  prof.cleaned = editedCleaned;
+
+  const sectionsPayload = [{ _cleaned_v1: true, cleaned: editedCleaned }];
+
+  // Update the short fields on the profile row too (business_name, etc.)
+  const updatePayload = {
+    business_name: editedShort.business_name ?? prof.business_name ?? s.business_name,
+    owner_name: prof.owner_name || s.owner_name,
+    sections: sectionsPayload,
   };
-  const sectionsPayload = [{ _gazette: true, role: prof.role, location: prof.location, cards: prof.cards }];
-  const { error } = await sb.from('profiles').update({
-    business_name: prof.business_name, owner_name: prof.owner_name,
-    tagline: prof.tagline, hero_image: prof.hero_image,
-    sections: sectionsPayload, contact: prof.contact,
-  }).eq('id', prof.id);
+
+  const { error } = await sb.from('profiles').update(updatePayload).eq('id', prof.id);
   if (error) { toast('Save failed: ' + error.message); return; }
   toast('Saved');
 };
 
-window.saveAndPreview = async () => {
-  await window.saveProfile();
-  document.querySelector('[data-tab=preview]').click();
-};
-
-// GENERATE (AI)
-window.generateProfile = async () => {
+// ============================================================
+// CLEAN UP ANSWERS (AI)
+// ============================================================
+window.cleanUpAnswers = async () => {
   const s = adminState.selected;
-  const btn = document.getElementById('genBtn');
-  btn.innerHTML = '<span class="spinner"></span> Generating...';
+  const btn = document.getElementById('cleanBtn');
+  btn.innerHTML = '<span class="spinner"></span> Cleaning up...';
   btn.disabled = true;
+
   try {
     const resp = await fetch('/api/generate-profile', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers: s.answers, business_name: s.business_name, owner_name: s.owner_name })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers: s.answers || {} }),
     });
-    if (!resp.ok) { throw new Error('API error: ' + await resp.text()); }
-    const draft = await resp.json();
-    const sectionsPayload = [{
-      _gazette: true, role: draft.role || 'Founder', location: draft.location || '',
-      cards: draft.cards || { origin: [], speed: [], lessons: [] },
-    }];
+    if (!resp.ok) {
+      const errTxt = await resp.text();
+      throw new Error(errTxt);
+    }
+    const data = await resp.json();
+    const cleaned = data.cleaned || {};
+
+    const sectionsPayload = [{ _cleaned_v1: true, cleaned }];
+
     const existing = adminState.profiles[s.id];
     const payload = {
       submission_id: s.id,
-      business_name: s.business_name || '', owner_name: s.owner_name || '',
-      tagline: draft.tagline || '',
+      business_name: s.business_name || '',
+      owner_name: s.owner_name || '',
+      tagline: '',
       hero_image: (s.photos && s.photos[0] && s.photos[0].url) || '',
       sections: sectionsPayload,
       gallery: (s.photos || []).map(p => ({ url: p.url, caption: p.caption || '' })),
       contact: (s.answers && s.answers.contact) || {},
     };
+
     let result;
-    if (existing) result = await sb.from('profiles').update(payload).eq('id', existing.id).select().single();
-    else result = await sb.from('profiles').insert(payload).select().single();
+    if (existing) {
+      result = await sb.from('profiles').update(payload).eq('id', existing.id).select().single();
+    } else {
+      result = await sb.from('profiles').insert(payload).select().single();
+    }
     if (result.error) throw result.error;
+
     adminState.profiles[s.id] = hydrateProfile(result.data);
-    toast('Profile draft generated');
+    toast('Answers cleaned up');
     renderDetail();
+    // Auto-jump to the profile tab so they can see the result
+    document.querySelector('[data-tab=profile]').click();
   } catch (e) {
     console.error(e);
-    toast('Generation failed: ' + e.message);
-    btn.innerHTML = 'Generate profile draft';
+    toast('Cleanup failed: ' + e.message);
+    btn.innerHTML = 'Clean up answers';
     btn.disabled = false;
   }
 };
 
+// ============================================================
 // PUBLISH
+// ============================================================
 window.publishProfile = async () => {
   const s = adminState.selected;
   const prof = adminState.profiles[s.id];
@@ -559,67 +592,14 @@ window.publishProfile = async () => {
   prof.published = true;
   await sb.from('submissions').update({ status: 'published' }).eq('id', s.id);
   s.status = 'published';
-  renderList(); renderDetail();
+  renderList();
+  renderDetail();
   toast('Published');
 };
 
-// EXPORT
-window.exportProfile = () => {
-  exportMode = 'block';
-  updateExportTabs();
-  renderExportContent();
-  document.getElementById('exportModal').classList.add('active');
-};
-
-function updateExportTabs() {
-  const block = document.getElementById('exportTabBlock');
-  const standalone = document.getElementById('exportTabStandalone');
-  if (exportMode === 'block') { block.classList.add('active'); standalone.classList.remove('active'); }
-  else { block.classList.remove('active'); standalone.classList.add('active'); }
-}
-
-function renderExportContent() {
-  const s = adminState.selected;
-  const prof = adminState.profiles[s.id];
-  const html = exportMode === 'standalone' ? buildStandaloneHTML(prof) : buildProfileBlockHTML(prof);
-  document.getElementById('exportPre').textContent = html;
-}
-
-document.getElementById('exportTabBlock').onclick = () => { exportMode = 'block'; updateExportTabs(); renderExportContent(); };
-document.getElementById('exportTabStandalone').onclick = () => { exportMode = 'standalone'; updateExportTabs(); renderExportContent(); };
-document.getElementById('closeExport').onclick = () => { document.getElementById('exportModal').classList.remove('active'); };
-document.getElementById('copyHtml').onclick = () => {
-  navigator.clipboard.writeText(document.getElementById('exportPre').textContent);
-  toast('Copied to clipboard');
-};
-document.getElementById('downloadHtml').onclick = () => {
-  const s = adminState.selected;
-  const prof = adminState.profiles[s.id];
-  const html = document.getElementById('exportPre').textContent;
-  const blob = new Blob([html], { type: 'text/html' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  const slug = (prof.business_name || 'profile').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const suffix = exportMode === 'standalone' ? '' : '-block';
-  a.download = `${slug}${suffix}.html`;
-  a.click();
-};
-
-// PREVIEW
-function renderPreviewTab() {
-  const s = adminState.selected;
-  if (!s) return;
-  const prof = adminState.profiles[s.id];
-  const container = document.getElementById('tab-preview');
-  if (!prof) {
-    container.innerHTML = '<p style="color:var(--ink-mute);font-style:italic;padding:40px 0;">Generate a profile draft first to see a preview.</p>';
-    return;
-  }
-  const html = buildStandaloneHTML(prof);
-  container.innerHTML = `<iframe class="preview-frame" srcdoc="${escapeAttr(html)}"></iframe>`;
-}
-
+// ============================================================
 // UTILS
+// ============================================================
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -628,7 +608,6 @@ function toast(msg) {
 function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]);
 }
-function escapeAttr(s) { return String(s || '').replace(/"/g, '&quot;'); }
 function timeAgo(iso) {
   const d = new Date(iso);
   const s = Math.floor((Date.now() - d.getTime()) / 1000);
@@ -636,151 +615,6 @@ function timeAgo(iso) {
   if (s < 3600) return Math.floor(s/60) + 'm ago';
   if (s < 86400) return Math.floor(s/3600) + 'h ago';
   return Math.floor(s/86400) + 'd ago';
-}
-
-// GAZETTE HTML BUILDERS
-function renderQABody(items) {
-  if (!items || !items.length) return '';
-  return items.map(qa => {
-    if (!qa.q && !qa.a) return '';
-    const paras = String(qa.a || '').split(/\n\n+/).map(p => p.trim()).filter(Boolean);
-    const body = paras.map(p => `<p class="gz-p">${escapeHtml(p).replace(/\n/g, '<br/>')}</p>`).join('');
-    return `<p class="gz-q"><strong>${escapeHtml(qa.q)}</strong></p>${body}`;
-  }).join('');
-}
-
-function buildProfileBlockHTML(p) {
-  const cards = p.cards || { origin: [], speed: [], lessons: [] };
-  const gallery = (p.gallery || []).filter(g => g && g.url);
-  const hero = p.hero_image || (gallery[0] && gallery[0].url) || '';
-  const remainingGallery = hero ? gallery.filter(g => g.url !== hero) : gallery;
-
-  const c = p.contact || {};
-  const contactIcons = [
-    c.website && `<a class="gz-icon" href="${escapeHtml(c.website)}" target="_blank" rel="noopener" title="Website">🌐</a>`,
-    c.facebook && `<a class="gz-icon" href="${escapeHtml(c.facebook)}" target="_blank" rel="noopener" title="Facebook">f</a>`,
-    c.instagram && `<a class="gz-icon" href="${c.instagram.startsWith('http') ? escapeHtml(c.instagram) : 'https://instagram.com/' + escapeHtml(c.instagram.replace('@',''))}" target="_blank" rel="noopener" title="Instagram">IG</a>`,
-    c.tiktok && `<a class="gz-icon" href="${c.tiktok.startsWith('http') ? escapeHtml(c.tiktok) : 'https://tiktok.com/@' + escapeHtml(c.tiktok.replace('@',''))}" target="_blank" rel="noopener" title="TikTok">TT</a>`,
-  ].filter(Boolean).join('');
-
-  const styles = `
-<style>
-  .gz-root{--gz-paper:#fbf6e3;--gz-ink:#582913;--gz-ink-soft:#212121;--gz-ink-mute:#7c6a62;--gz-gold:#a87d3b;--gz-gold-soft:#c2995b;--gz-white:#fff;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--gz-ink-soft);background:var(--gz-paper);max-width:1100px;margin:0 auto;padding:clamp(24px,5vw,48px) clamp(16px,4vw,32px);line-height:1.5;box-sizing:border-box}
-  .gz-root *{box-sizing:border-box}
-  .gz-header{text-align:center;padding-bottom:24px;border-bottom:1px solid var(--gz-ink-mute);margin-bottom:32px}
-  .gz-hero{max-width:640px;margin:0 auto 32px;border:6px solid var(--gz-white);box-shadow:0 2px 20px rgba(31,27,22,0.12);overflow:hidden}
-  .gz-hero img{display:block;width:100%;height:auto;aspect-ratio:2.015/1;object-fit:cover}
-  .gz-title{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:clamp(32px,5.5vw,56px);letter-spacing:-0.015em;color:var(--gz-ink);line-height:1.15;margin:0 auto 14px;max-width:900px}
-  .gz-dek{font-family:'Inter',sans-serif;font-size:clamp(15px,1.5vw,18px);color:var(--gz-ink-soft);line-height:1.5;max-width:780px;margin:0 auto}
-  .gz-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
-  @media(max-width:720px){.gz-grid{grid-template-columns:1fr}}
-  .gz-col{display:flex;flex-direction:column;gap:24px}
-  .gz-card{background:var(--gz-white);border:1px solid #e8e8e8;border-radius:16px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
-  .gz-card-head{display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px dotted var(--gz-ink-mute);margin-bottom:16px}
-  .gz-card-icon{width:32px;height:32px;border-radius:50%;background:var(--gz-gold);display:inline-flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;font-size:14px;font-weight:700}
-  .gz-card-title{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:20px;letter-spacing:-0.01em;color:var(--gz-ink);margin:0;flex:1}
-  .gz-facts-name{font-family:'Inter',sans-serif;font-weight:700;font-size:15px;color:var(--gz-ink-soft);margin:0 0 4px;letter-spacing:-0.01em}
-  .gz-facts-role{font-family:'Inter',sans-serif;font-size:14px;color:var(--gz-ink-soft);margin:0 0 2px}
-  .gz-facts-loc{font-family:'Inter',sans-serif;font-style:italic;font-size:13px;color:var(--gz-ink-mute);margin:0 0 14px}
-  .gz-icons{display:flex;gap:12px;flex-wrap:wrap}
-  .gz-icon{width:32px;height:32px;border-radius:50%;background:var(--gz-gold);display:inline-flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:12px;font-weight:700;font-family:'Inter',sans-serif;transition:background 0.2s}
-  .gz-icon:hover{background:var(--gz-gold-soft)}
-  .gz-gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .gz-gallery img{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;border-radius:8px}
-  .gz-q{font-family:'Inter',sans-serif;font-weight:700;font-size:15px;color:var(--gz-ink);margin:16px 0 8px;line-height:1.4}
-  .gz-q:first-child{margin-top:0}
-  .gz-q strong{font-weight:700}
-  .gz-p{font-family:'Inter',sans-serif;font-size:15px;line-height:1.6;color:var(--gz-ink-soft);margin:0 0 12px}
-  .gz-p:last-child{margin-bottom:0}
-</style>`;
-
-  const origin = renderQABody(cards.origin);
-  const speed = renderQABody(cards.speed);
-  const lessons = renderQABody(cards.lessons);
-
-  const galleryHtml = remainingGallery.length > 0 ? `
-      <div class="gz-card">
-        <div class="gz-card-head">
-          <span class="gz-card-icon">▦</span>
-          <h3 class="gz-card-title">Image Gallery</h3>
-        </div>
-        <div class="gz-gallery">
-          ${remainingGallery.map(g => `<img src="${escapeHtml(g.url)}" alt="${escapeHtml(g.caption || '')}" />`).join('')}
-        </div>
-      </div>` : '';
-
-  return `${styles}
-<article class="gz-root">
-  <header class="gz-header">
-    ${hero ? `<div class="gz-hero"><img src="${escapeHtml(hero)}" alt="${escapeHtml(p.business_name || '')}" /></div>` : ''}
-    <h1 class="gz-title">${escapeHtml(p.business_name || '')}</h1>
-    ${p.tagline ? `<p class="gz-dek">${escapeHtml(p.tagline)}</p>` : ''}
-  </header>
-
-  <div class="gz-grid">
-    <div class="gz-col">
-      ${origin ? `
-      <div class="gz-card">
-        <div class="gz-card-head">
-          <span class="gz-card-icon">◷</span>
-          <h3 class="gz-card-title">Origin Story / Overview</h3>
-        </div>
-        ${origin}
-      </div>` : ''}
-      ${lessons ? `
-      <div class="gz-card">
-        <div class="gz-card-head">
-          <span class="gz-card-icon">✦</span>
-          <h3 class="gz-card-title">Lessons &amp; Advice</h3>
-        </div>
-        ${lessons}
-      </div>` : ''}
-    </div>
-
-    <div class="gz-col">
-      <div class="gz-card">
-        <div class="gz-card-head">
-          <span class="gz-card-icon">i</span>
-          <h3 class="gz-card-title">Quick Facts</h3>
-        </div>
-        <p class="gz-facts-name">${escapeHtml(p.owner_name || '')}</p>
-        <p class="gz-facts-role">${escapeHtml(p.role || 'Founder')}</p>
-        <p class="gz-facts-loc">${escapeHtml(p.location || '')}</p>
-        ${contactIcons ? `<div class="gz-icons">${contactIcons}</div>` : ''}
-      </div>
-      ${galleryHtml}
-      ${speed ? `
-      <div class="gz-card">
-        <div class="gz-card-head">
-          <span class="gz-card-icon">⚡</span>
-          <h3 class="gz-card-title">Speed Round</h3>
-        </div>
-        ${speed}
-      </div>` : ''}
-    </div>
-  </div>
-</article>`;
-}
-
-function buildStandaloneHTML(p) {
-  const block = buildProfileBlockHTML(p);
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(p.business_name || 'Profile')} &mdash; Aboitiz-Moraza Gazette</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  body { margin: 0; background: #fbf6e3; min-height: 100vh; }
-</style>
-</head>
-<body>
-${block}
-</body>
-</html>`;
 }
 </script>
 </body>
