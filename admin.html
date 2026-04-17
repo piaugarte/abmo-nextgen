@@ -106,11 +106,24 @@
   .actions-bar { display: flex; gap: 10px; flex-wrap: wrap; }
 
   /* PROFILE COPY (editable) */
-  .copy-field { margin-bottom: 20px; }
-  .copy-field label {
-    display: block; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--ink-soft); margin-bottom: 6px; font-weight: 500;
+  .copy-field { margin-bottom: 20px; position: relative; }
+  .copy-field .row {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
   }
+  .copy-field label {
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--ink-soft); font-weight: 500;
+  }
+  .copy-field .copy-btn {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--ink-mute); font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; font-family: inherit; padding: 4px 8px;
+    border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;
+    transition: all 0.15s;
+  }
+  .copy-field .copy-btn:hover { background: rgba(31,27,22,0.06); color: var(--ink); }
+  .copy-field .copy-btn.copied { color: var(--green); }
+  .copy-field .copy-btn svg { width: 13px; height: 13px; }
   .copy-field input, .copy-field textarea {
     width: 100%; padding: 12px 14px; border: 1px solid rgba(31,27,22,0.2);
     background: #fff; font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.6;
@@ -492,6 +505,7 @@ function renderProfileTab() {
   }
 
   const cleaned = prof.cleaned || {};
+  const copyIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
   let html = '';
 
   SECTIONS.forEach(sec => {
@@ -504,7 +518,10 @@ function renderProfileTab() {
         if (!raw) return;
         sectionHtml += `
           <div class="copy-field">
-            <label>${escapeHtml(q.label)}</label>
+            <div class="row">
+              <label>${escapeHtml(q.label)}</label>
+              <button type="button" class="copy-btn" onclick="copyFieldValue('${q.key}', this)" title="Copy answer">${copyIconSVG}<span>Copy</span></button>
+            </div>
             <input type="text" data-field-key="${q.key}" value="${escapeHtml(raw)}" />
           </div>`;
       } else {
@@ -513,7 +530,10 @@ function renderProfileTab() {
         const rows = q.type === 'short' ? 2 : 6;
         sectionHtml += `
           <div class="copy-field">
-            <label>${escapeHtml(q.label)}</label>
+            <div class="row">
+              <label>${escapeHtml(q.label)}</label>
+              <button type="button" class="copy-btn" onclick="copyFieldValue('${q.key}', this)" title="Copy answer">${copyIconSVG}<span>Copy</span></button>
+            </div>
             <textarea data-field-key="${q.key}" rows="${rows}">${escapeHtml(val)}</textarea>
           </div>`;
       }
@@ -530,6 +550,25 @@ function renderProfileTab() {
 
   container.innerHTML = html;
 }
+
+// Copy a single field's current value to clipboard
+window.copyFieldValue = (key, btn) => {
+  const el = document.querySelector(`[data-field-key="${key}"]`);
+  if (!el) return;
+  const text = el.value || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const label = btn.querySelector('span');
+    const originalText = label ? label.textContent : 'Copy';
+    if (label) label.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      if (label) label.textContent = originalText;
+      btn.classList.remove('copied');
+    }, 1600);
+  }).catch(err => {
+    toast('Copy failed: ' + err.message);
+  });
+};
 
 window.saveProfile = async () => {
   const s = adminState.selected;
