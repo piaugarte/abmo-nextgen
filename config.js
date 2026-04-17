@@ -8,8 +8,8 @@
 // ============================================================
 
 window.APP_CONFIG = {
-  SUPABASE_URL: "https://YOUR-PROJECT.supabase.co",
-  SUPABASE_ANON_KEY: "YOUR-ANON-PUBLIC-KEY",
+  SUPABASE_URL: "https://foojejwfvbblvozlffmt.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvb2plandmdmJibHZvemxmZm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzODAzMTIsImV4cCI6MjA5MTk1NjMxMn0.Q3JKRL3ibRx41vRtPqSal1BqK1FZvw6JWeXSoLqrhPs",
 
   // Admin gate — this is NOT real security, just a soft gate for your team.
   // The actual protection is on the serverless function (see /api/admin.js)
