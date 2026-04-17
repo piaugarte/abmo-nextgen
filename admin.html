@@ -203,7 +203,7 @@ let adminState = { submissions: [], selected: null, filter: 'all', profiles: {} 
 // ============================================================
 const SECTIONS = [
   {
-    title: "The basics",
+    title: "Introduction",
     questions: [
       { key: "business_name",  label: "What is your business called?", type: "short" },
       { key: "one_liner",      label: "Describe your business in a sentence.", type: "short" },
@@ -214,7 +214,6 @@ const SECTIONS = [
     questions: [
       { key: "intro",          label: "Introduce yourself." },
       { key: "inspiration",    label: "What inspired this venture?" },
-      { key: "purpose",        label: "What is this business really about?" },
       { key: "hopes",          label: "What do you hope younger family members learn from your story?" },
       { key: "support",        label: "How can our family best support your business?" },
     ],
@@ -247,8 +246,14 @@ const SECTIONS = [
 const Q_LABEL_BY_KEY = {};
 SECTIONS.forEach(sec => sec.questions.forEach(q => { Q_LABEL_BY_KEY[q.key] = q.label; }));
 
+// Retired questions that may exist on old submissions
+// (shown in raw answers tab under "Older questions" for back-compat)
+const RETIRED_QUESTIONS = {
+  purpose: "What is this business really about?",
+};
+
 // Which keys are "long form" — the ones we send to AI for cleanup
-const CLEANABLE_KEYS = ['one_liner', 'intro', 'inspiration', 'purpose', 'hopes', 'support', 'routine', 'challenge', 'win', 'lesson', 'principle', 'advice', 'open_to'];
+const CLEANABLE_KEYS = ['one_liner', 'intro', 'inspiration', 'hopes', 'support', 'routine', 'challenge', 'win', 'lesson', 'principle', 'advice', 'open_to'];
 
 // ============================================================
 // GATE
@@ -436,6 +441,19 @@ function renderAnswersTab() {
       html += `<h2 class="section-header">${escapeHtml(sec.title)}</h2>${sectionHtml}`;
     }
   });
+
+  // Retired questions — only shown if the submitter actually answered them
+  // (e.g., older submissions made before a question was removed)
+  let retiredHtml = '';
+  Object.keys(RETIRED_QUESTIONS).forEach(key => {
+    const val = a[key];
+    if (val && String(val).trim().length > 0) {
+      retiredHtml += `<div class="qa-block"><div class="q">${escapeHtml(RETIRED_QUESTIONS[key])}</div><div class="a">${escapeHtml(val)}</div></div>`;
+    }
+  });
+  if (retiredHtml) {
+    html += `<h2 class="section-header" style="color:var(--ink-mute);">Older questions</h2>${retiredHtml}`;
+  }
 
   // Contact
   if (a.contact && (a.contact.email || a.contact.website || a.contact.instagram || a.contact.other)) {
