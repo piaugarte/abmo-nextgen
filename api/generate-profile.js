@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   // fields are left alone.
   const CLEANABLE_KEYS = [
     'one_liner',
-    'intro', 'inspiration', 'purpose', 'hopes', 'support',
+    'intro', 'inspiration', 'hopes', 'support',
     'routine', 'challenge', 'win',
     'lesson', 'principle', 'advice',
     'open_to',
