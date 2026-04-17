@@ -175,7 +175,7 @@
 <body>
 
 <header class="masthead">
-  <div class="mark">Family &mdash; <span>Est. Spotlight</span></div>
+  <div class="mark">&nbsp;</div>
   <div class="session">
     <span id="sessionEmail"></span>
     <button id="switchAccountBtn" style="display:none">Use different email</button>
@@ -184,12 +184,11 @@
 </header>
 
 <main class="hero" id="landing">
-  <div class="eyebrow">An invitation</div>
   <h1>Tell us the<br/>story of your<br/><em>business.</em></h1>
   <p class="lede">
-    We're gathering the quiet, remarkable ventures our family has built &mdash;
+    We're gathering the quiet, remarkable ventures our family has built
     so the next generation knows what's possible, and who to turn to.
-    Share as much or as little as you'd like. Skip anything. Come back anytime.
+    Share as much or as little as you'd like. Save your progress and come back anytime.
   </p>
 
   <div class="cta-row">
@@ -198,17 +197,16 @@
   </div>
 
   <div class="meta">
-    <div class="item"><div class="label">Time needed</div><div class="val">15&ndash;20 minutes</div></div>
-    <div class="item"><div class="label">Every question</div><div class="val">Optional &amp; skippable</div></div>
-    <div class="item"><div class="label">Save &amp; resume</div><div class="val">Anytime, any device</div></div>
+    <div class="item"><div class="label">Time needed</div><div class="val">10 minutes</div></div>
+    <div class="item"><div class="label">Save &amp; resume</div><div class="val">Anytime. Log back on with your email</div></div>
   </div>
 </main>
 
 <main class="questionnaire" id="questionnaire">
   <div class="progress-rail">
-    <span class="count" id="stepCount">01 / 17</span>
+    <span class="count" id="stepCount">01 / 16</span>
     <div class="bar" id="progressBar"></div>
-    <span class="section-name" id="sectionName">The basics</span>
+    <span class="section-name" id="sectionName">Introduction</span>
   </div>
 
   <div id="stepContainer"></div>
@@ -285,16 +283,15 @@
 // QUESTIONNAIRE DEFINITION
 // ============================================================
 const QUESTIONS = [
-  { section: "The basics", key: "owner_name", label: "Your name", type: "name_fields",
-    eyebrow: "Let's start simple",
+  { section: "Introduction", key: "owner_name", label: "Your name", type: "name_fields",
     title: "Who are we speaking with?", helper: "This will appear on your profile page. Middle name is optional." },
 
-  { section: "The basics", key: "business_name", label: "Name of your business", type: "text",
-    placeholder: "The name you're proud of", eyebrow: "About your venture",
+  { section: "Introduction", key: "business_name", label: "Name of your business", type: "text",
+    placeholder: "Company Name",
     title: "What is your business called?", helper: "Exactly as you'd like it printed &mdash; capitalization and all." },
 
-  { section: "The basics", key: "one_liner", label: "In one sentence, what do you do?", type: "text",
-    placeholder: "We help ___ by ___", eyebrow: "The elevator pitch",
+  { section: "Introduction", key: "one_liner", label: "In one sentence, what do you do?", type: "text",
+    placeholder: "",
     title: "Describe your business in a sentence.", helper: "Imagine explaining it to a cousin at a family dinner." },
 
   { section: "Spotlight interview", key: "intro", label: "Introduce yourself and your business", type: "textarea",
@@ -303,14 +300,9 @@ const QUESTIONS = [
     helper: "Who are you, what did you build, and how long has it been going?" },
 
   { section: "Spotlight interview", key: "inspiration", label: "What inspired you to start?", type: "textarea",
-    placeholder: "The spark, the moment, the people who shaped this...",
+    placeholder: "",
     eyebrow: "Spotlight interview", title: "What inspired this venture?",
-    helper: "And how did your family &mdash; past or present &mdash; influence the journey?" },
-
-  { section: "Spotlight interview", key: "purpose", label: "The problem or need you're addressing", type: "textarea",
-    placeholder: "What does the world gain from your business existing?",
-    eyebrow: "Spotlight interview", title: "What is this business really about?",
-    helper: "Beyond the products or services &mdash; what's the real purpose?" },
+    helper: "And how did your family influence the journey?" },
 
   { section: "Spotlight interview", key: "hopes", label: "What do you hope family takes away?", type: "textarea",
     placeholder: "Lessons, inspiration, possibilities...",
