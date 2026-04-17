@@ -96,6 +96,13 @@
   .field input:focus, .field textarea:focus { outline: none; border-bottom-color: var(--accent); border-bottom-width: 2px; }
   .field input::placeholder, .field textarea::placeholder { color: var(--ink-mute); font-style: italic; font-weight: 300; }
 
+  .name-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+  .name-grid .field { margin-bottom: 0; }
+  .name-grid .field label .optional-inline { color: var(--ink-mute); font-weight: 400; text-transform: none; letter-spacing: 0; font-style: italic; font-size: 11px; margin-left: 6px; }
+  @media (max-width: 640px) {
+    .name-grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+
   .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 48px; padding-top: 32px; border-top: 1px solid rgba(31,27,22,0.15); gap: 16px; flex-wrap: wrap; }
   .nav-left { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
   .nav-right { display: flex; gap: 8px; align-items: center; }
@@ -262,9 +269,9 @@
 // QUESTIONNAIRE DEFINITION
 // ============================================================
 const QUESTIONS = [
-  { section: "The basics", key: "owner_name", label: "Your name", type: "text",
-    placeholder: "First and last name", eyebrow: "Let's start simple",
-    title: "Who are we speaking with?", helper: "This will appear on your profile page." },
+  { section: "The basics", key: "owner_name", label: "Your name", type: "name_fields",
+    eyebrow: "Let's start simple",
+    title: "Who are we speaking with?", helper: "This will appear on your profile page. Middle name is optional." },
 
   { section: "The basics", key: "business_name", label: "Name of your business", type: "text",
     placeholder: "The name you're proud of", eyebrow: "About your venture",
@@ -624,6 +631,26 @@ function renderStep() {
         <textarea id="input_${q.key}" placeholder="${q.placeholder}">${escapeHtml(val)}</textarea>
       </div>
     `;
+  } else if (q.type === 'name_fields') {
+    const first = state.answers.first_name || '';
+    const middle = state.answers.middle_name || '';
+    const last = state.answers.last_name || '';
+    inputHtml = `
+      <div class="name-grid">
+        <div class="field">
+          <label>First name</label>
+          <input type="text" id="input_first_name" placeholder="First" value="${escapeHtml(first)}" />
+        </div>
+        <div class="field">
+          <label>Middle name <span class="optional-inline">optional</span></label>
+          <input type="text" id="input_middle_name" placeholder="Middle" value="${escapeHtml(middle)}" />
+        </div>
+        <div class="field">
+          <label>Last name</label>
+          <input type="text" id="input_last_name" placeholder="Last" value="${escapeHtml(last)}" />
+        </div>
+      </div>
+    `;
   } else if (q.type === 'photos') {
     inputHtml = renderPhotoUploader();
   } else if (q.type === 'contact') {
@@ -646,6 +673,23 @@ function renderStep() {
       state.answers[q.key] = input.value;
       scheduleSave();
     });
+  } else if (q.type === 'name_fields') {
+    const first = document.getElementById('input_first_name');
+    const middle = document.getElementById('input_middle_name');
+    const last = document.getElementById('input_last_name');
+    first.focus();
+    const updateName = () => {
+      state.answers.first_name = first.value;
+      state.answers.middle_name = middle.value;
+      state.answers.last_name = last.value;
+      // Compose full name for downstream use (admin dashboard, AI generation)
+      const parts = [first.value.trim(), middle.value.trim(), last.value.trim()].filter(Boolean);
+      state.answers.owner_name = parts.join(' ');
+      scheduleSave();
+    };
+    first.addEventListener('input', updateName);
+    middle.addEventListener('input', updateName);
+    last.addEventListener('input', updateName);
   } else if (q.type === 'photos') {
     bindPhotoUploader();
   } else if (q.type === 'contact') {
