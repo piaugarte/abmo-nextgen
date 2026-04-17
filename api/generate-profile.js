@@ -1,11 +1,19 @@
+
 // ============================================================
 // /api/generate-profile.js — Vercel Serverless Function
 // ============================================================
-// Takes questionnaire answers, asks Claude to draft polished
-// profile copy, returns structured JSON the admin can edit.
+// Takes questionnaire answers and generates a profile structured
+// to match the Aboitiz-Moraza Gazette layout:
+//   - tagline (one-line italic dek under the title)
+//   - role (e.g. "Founder", "Owner & Operator")
+//   - location (city, country)
+//   - three Q&A cards: Origin Story, Speed Round, Lessons & Advice
 //
-// Environment variables needed on Vercel:
-//   ANTHROPIC_API_KEY - your key from console.anthropic.com
+// Each card contains Q&A pairs with lightly edited answers
+// (grammar, flow) that preserve the owner's voice.
+//
+// Env var needed on Vercel:
+//   ANTHROPIC_API_KEY
 // ============================================================
 
 export default async function handler(req, res) {
@@ -20,38 +28,85 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Server missing ANTHROPIC_API_KEY env var' });
   }
 
-  // Build a readable dump of the raw answers
-  const answerDump = Object.entries(answers)
-    .filter(([k, v]) => v && typeof v === 'string' && v.trim().length > 0)
-    .map(([k, v]) => `${k.toUpperCase()}:\n${v}`)
+  // The question prompts that appeared in the questionnaire — we reuse them
+  // so the AI knows what question goes with what answer.
+  const Q_LABELS = {
+    intro: "Can you briefly introduce yourself and your business?",
+    inspiration: "What inspired you to start this venture, and how did your family influence that journey?",
+    purpose: "What is this business really about, and what problem or need does it aim to address?",
+    hopes: "What do you hope family members will learn or take away from your entrepreneurial story?",
+    support: "How can our family best support your business moving forward?",
+    routine: "What is one part of your daily routine?",
+    challenge: "What is one challenge you've had to overcome?",
+    win: "What is one small win you're proud of?",
+    lesson: "What is one lesson business has taught you that you wish you knew earlier?",
+    principle: "What principle, habit, or mindset has helped you succeed, and why?",
+    advice: "What advice would you give a family member who wants to start or grow their own business?",
+    open_to: "Are you open to mentoring a younger family member, or offering an internship?",
+  };
+
+  // Which questions go in which card
+  const CARD_MAP = {
+    origin: ["intro", "inspiration", "purpose", "hopes"],
+    speed: ["routine", "challenge", "win"],
+    lessons: ["lesson", "principle", "advice", "support", "open_to"],
+  };
+
+  // Build a readable dump for the model
+  const formatQA = (keys) => keys
+    .filter(k => answers[k] && String(answers[k]).trim().length > 0)
+    .map(k => `Q: ${Q_LABELS[k]}\nA: ${answers[k]}`)
     .join('\n\n');
 
-  const systemPrompt = `You are a thoughtful editor at a family newsletter, crafting intimate profile pieces of family members' businesses for a "Family Entrepreneur Spotlight." Your voice is warm, editorial, and quietly elegant — never corporate, never salesy, never using AI cliches like "unlock potential" or "journey of growth." You write like someone who knows the person personally. You preserve the person's own voice, anecdotes, and specific details; you simply polish and structure.
+  const originQA = formatQA(CARD_MAP.origin);
+  const speedQA = formatQA(CARD_MAP.speed);
+  const lessonsQA = formatQA(CARD_MAP.lessons);
 
-Return ONLY valid JSON matching this exact shape, no markdown fences, no commentary:
+  const systemPrompt = `You are a thoughtful editor at a family newsletter called the "Aboitiz-Moraza Gazette," preparing an entrepreneur spotlight article. The article is structured as three Q&A cards (Origin Story, Speed Round, Lessons & Advice) — not flattened prose.
+
+Your job:
+1. Write a single-sentence TAGLINE (under 25 words) that captures the essence of this business and entrepreneur. Editorial, evocative, not salesy. It will appear in italic under the title.
+2. Guess a concise ROLE TITLE for the owner (e.g. "Founder", "Founder & CEO", "Owner & Creative Director"). Default to "Founder" if unclear.
+3. Guess a LOCATION in the form "City, Country" from any clues in their answers. If no clues, use "Philippines".
+4. For each card, lightly edit each answer: fix grammar, tighten awkward sentences, preserve the owner's voice and specific details. Do NOT invent facts. Do NOT remove content. Keep it first-person. Keep paragraph breaks between ideas.
+
+Return ONLY valid JSON, no markdown fences, no commentary:
 
 {
-  "business_name": string,
-  "owner_name": string,
-  "tagline": string,  // one evocative sentence, under 20 words
-  "sections": [
-    { "heading": string, "body": string }  // 3 to 5 sections, each body 80-180 words
-  ]
+  "tagline": string,
+  "role": string,
+  "location": string,
+  "cards": {
+    "origin": [{"q": string, "a": string}, ...],
+    "speed": [{"q": string, "a": string}, ...],
+    "lessons": [{"q": string, "a": string}, ...]
+  }
 }
 
-Section guidelines:
-- Draw sections from their answers. Suggested headings: "The origin", "What we do", "A typical day", "A lesson learned", "What success looks like", "How family can help". Adapt based on what they shared.
-- In bodies, use their specific stories and phrases. Keep a reflective, first-person voice (as if the owner wrote it).
-- If they didn't share something, don't invent it. Skip that section instead.
-- No headings like "About Us" or "Our Mission" — use evocative, specific phrases.`;
+Rules for the "a" field:
+- Use \\n\\n between paragraphs (double newline).
+- Preserve all the key facts, names, places, and specific details.
+- Do not add preamble like "Certainly!" or editorial asides.
+- If an answer is empty or missing, simply omit that Q&A pair from the card array.`;
 
-  const userPrompt = `Here are the raw questionnaire answers from ${owner_name || 'the entrepreneur'} about their business${business_name ? ` (${business_name})` : ''}:
+  const userPrompt = `Entrepreneur: ${owner_name || 'Unknown'}
+Business: ${business_name || 'Unknown'}
 
 ---
-${answerDump}
+ORIGIN STORY ANSWERS:
+${originQA || '(none provided)'}
+
+---
+SPEED ROUND ANSWERS:
+${speedQA || '(none provided)'}
+
+---
+LESSONS & ADVICE ANSWERS:
+${lessonsQA || '(none provided)'}
+
 ---
 
-Draft the profile now. Return only the JSON object.`;
+Generate the profile JSON now.`;
 
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
@@ -63,7 +118,7 @@ Draft the profile now. Return only the JSON object.`;
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 2000,
+        max_tokens: 4000,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],
       }),
@@ -77,14 +132,25 @@ Draft the profile now. Return only the JSON object.`;
     const data = await resp.json();
     const text = (data.content || []).map(b => b.text || '').join('').trim();
 
-    // Strip code fences if model adds them anyway
-    const cleaned = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+    // Strip markdown fences if present
+    const cleaned = text
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/```\s*$/i, '')
+      .trim();
 
     let parsed;
     try {
       parsed = JSON.parse(cleaned);
     } catch (e) {
-      return res.status(500).json({ error: 'Model returned non-JSON: ' + cleaned.slice(0, 300) });
+      return res.status(500).json({
+        error: 'Model returned non-JSON: ' + cleaned.slice(0, 500),
+      });
+    }
+
+    // Validate structure
+    if (!parsed.cards || typeof parsed.cards !== 'object') {
+      return res.status(500).json({ error: 'Missing cards in response' });
     }
 
     return res.status(200).json(parsed);
