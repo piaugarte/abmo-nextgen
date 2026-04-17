@@ -163,10 +163,74 @@
   #appToast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(200%); background: var(--ink); color: var(--paper); padding: 14px 26px; z-index: 200; font-size: 13px; letter-spacing: 0.03em; box-shadow: var(--shadow); transition: transform 0.3s; border-radius: 999px; font-family: 'Inter', sans-serif; }
   #appToast.show { transform: translateX(-50%) translateY(0); }
 
-  @media (max-width: 640px) {
-    .nav-row { flex-direction: column; align-items: stretch; }
-    .nav-left, .nav-right { width: 100%; justify-content: space-between; }
+  /* ============ MOBILE ============ */
+  @media (max-width: 760px) {
+    /* Masthead: stack session info, keep resume button accessible */
+    header.masthead { padding: 16px clamp(16px, 4vw, 24px) 0; gap: 10px; }
+    .session { font-size: 11px; gap: 10px; justify-content: flex-end; width: 100%; }
+    .session .synced { font-size: 11px; }
+
+    /* Hero: tighter padding, smaller headline */
+    .hero { padding: clamp(16px, 3vh, 32px) clamp(20px, 5vw, 32px) clamp(24px, 5vh, 48px); }
+    .hero h1 { font-size: clamp(40px, 11vw, 64px); line-height: 1; margin-bottom: 20px; }
+    .hero .lede { font-size: 16px; line-height: 1.5; margin-bottom: 24px; }
+    .hero .meta { grid-template-columns: 1fr; gap: 16px; padding-top: 24px; }
+    .hero .meta .item .val { font-size: 16px; }
+
+    /* CTA buttons: full width and stacked on phones */
+    .cta-row { flex-direction: column; gap: 10px; margin-top: 8px; margin-bottom: 16px; }
+    .cta-row .btn { width: 100%; justify-content: center; }
+
+    /* Questionnaire: tighter padding */
+    .questionnaire { padding: 8px clamp(20px, 5vw, 32px) 24px; }
+    .progress-rail { margin-bottom: 20px; padding-bottom: 14px; gap: 10px; }
+    .progress-rail .count { font-size: 12px; }
+    .progress-rail .section-name { font-size: 10px; letter-spacing: 0.15em; }
+
+    /* Step: allow natural height, smaller title */
+    .step { min-height: auto; }
+    .step-eyebrow { font-size: 10px; letter-spacing: 0.25em; margin-bottom: 12px; }
+    .step h2 { font-size: 26px; line-height: 1.2; margin-bottom: 10px; }
+    .step .helper { font-size: 14px; margin-bottom: 20px; }
+
+    /* Form inputs */
+    .field { margin-bottom: 20px; }
+    .field label { font-size: 11px; margin-bottom: 8px; }
+    .field input[type=text], .field input[type=email], .field input[type=url], .field textarea { font-size: 16px; padding: 12px 14px; }
+    .field textarea { min-height: 120px; }
+
+    /* Name grid already stacks at 640px, keep it */
+    .name-grid { grid-template-columns: 1fr; gap: 14px; }
+
+    /* Nav row: keep structure readable, shrink buttons */
+    .nav-row { flex-direction: column; align-items: stretch; gap: 10px; margin-top: 20px; padding-top: 16px; }
+    .nav-left, .nav-right { width: 100%; }
+    .nav-left { justify-content: space-between; }
+    .nav-right { justify-content: space-between; gap: 10px; }
     .nav-right .btn-primary { flex: 1; justify-content: center; }
+    .btn { padding: 12px 18px; font-size: 11px; }
+
+    /* Photo uploader: tighter padding */
+    .photo-drop { padding: 28px 16px; }
+    .photo-drop .icon { font-size: 36px; margin-bottom: 8px; }
+    .photo-preview { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+    /* Success page */
+    .success { padding: clamp(40px, 10vh, 80px) clamp(20px, 5vw, 32px); }
+    .success h2 { font-size: 36px; margin-bottom: 18px; }
+    .success p { font-size: 16px; margin-bottom: 28px; }
+
+    /* Modal */
+    .modal { padding: 28px 24px; max-width: 100%; }
+    .modal h3 { font-size: 22px; }
+    .modal-overlay { padding: 16px; }
+  }
+
+  /* Extra-small phones */
+  @media (max-width: 400px) {
+    .hero h1 { font-size: 40px; }
+    .step h2 { font-size: 22px; }
+    .progress-rail .section-name { display: none; }
   }
 </style>
 </head>
