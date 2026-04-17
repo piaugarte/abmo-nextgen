@@ -70,24 +70,23 @@
   .btn .arrow { transition: transform 0.25s; }
   .btn:hover .arrow { transform: translateX(4px); }
 
-  .questionnaire { max-width: 780px; margin: 0 auto; padding: 40px clamp(24px, 5vw, 64px) 120px; position: relative; z-index: 2; display: none; }
+  .questionnaire { max-width: 780px; margin: 0 auto; padding: 24px clamp(24px, 5vw, 64px) 60px; position: relative; z-index: 2; display: none; }
   .questionnaire.active { display: block; }
 
-  .progress-rail { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid rgba(31,27,22,0.15); }
+  .progress-rail { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid rgba(31,27,22,0.15); }
   .progress-rail .count { font-family: 'Fraunces', serif; font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: var(--accent); }
   .progress-rail .bar { flex: 1; height: 1px; background: rgba(31,27,22,0.15); position: relative; overflow: hidden; }
   .progress-rail .bar::after { content: ""; position: absolute; inset: 0; background: var(--accent); width: var(--pct, 0%); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
   .progress-rail .section-name { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); }
 
-  .step { display: none; animation: fadeUp 0.55s cubic-bezier(0.4, 0, 0.2, 1); }
+  .step { display: none; animation: fadeUp 0.55s cubic-bezier(0.4, 0, 0.2, 1); min-height: 440px; }
   .step.active { display: block; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-  .step-eyebrow { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .step-eyebrow { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
   .step-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-  .step h2 { font-family: 'Fraunces', serif; font-size: clamp(28px, 4vw, 42px); line-height: 1.1; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 14px; }
-  .step .optional-tag { display: inline-block; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); font-style: normal; background: rgba(122,111,97,0.12); padding: 4px 12px; margin-left: 10px; vertical-align: middle; font-family: 'Inter', sans-serif; font-weight: 600; border-radius: 999px; }
-  .step .helper { font-family: 'Inter', sans-serif; font-size: 15px; font-style: normal; color: var(--ink-soft); margin-bottom: 36px; line-height: 1.55; font-weight: 400; max-width: 580px; }
+  .step h2 { font-family: 'Fraunces', serif; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.15; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .step .helper { font-family: 'Inter', sans-serif; font-size: 15px; font-style: normal; color: var(--ink-soft); margin-bottom: 28px; line-height: 1.55; font-weight: 400; max-width: 580px; }
 
   .field { margin-bottom: 32px; }
   .field label { display: block; font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; font-weight: 600; }
@@ -225,12 +224,12 @@
 
 <main class="success" id="success">
   <div class="ornament">&#10042;</div>
-  <h2>Thank you, <em>truly.</em></h2>
+  <h2>Thank you!</h2>
   <p>
     Your responses are in. Our team will craft a profile from your words
     and share it back for your review before publishing. We'll be in touch soon.
   </p>
-  <button class="btn btn-ghost" onclick="location.reload()">Return home</button>
+  <a class="btn btn-primary" href="https://www.aboitizmoraza.com/ventures-and-trades" target="_blank" rel="noopener">Check out The Family Gazette <span class="arrow">&rarr;</span></a>
 </main>
 
 <footer>
@@ -665,10 +664,11 @@ function renderStep() {
     inputHtml = renderContactFields();
   }
 
+  const eyebrowText = q.eyebrow || q.section || '';
   container.innerHTML = `
     <div class="step active">
-      <div class="step-eyebrow"><span class="dot"></span> ${q.eyebrow}</div>
-      <h2>${q.title} <span class="optional-tag">Optional</span></h2>
+      ${eyebrowText ? `<div class="step-eyebrow"><span class="dot"></span> ${eyebrowText}</div>` : ''}
+      <h2>${q.title}</h2>
       <p class="helper">${q.helper}</p>
       ${inputHtml}
     </div>
@@ -791,7 +791,7 @@ window.removePhoto = async (i) => {
 function renderContactFields() {
   const c = state.contact || {};
   return `
-    <div class="field"><label>Public email (optional)</label>
+    <div class="field"><label>Public email</label>
       <input type="email" id="c_email" placeholder="hello@yourbusiness.com" value="${escapeHtml(c.email||'')}" />
     </div>
     <div class="field"><label>Website</label>
