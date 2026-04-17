@@ -1,0 +1,7 @@
+{
+  "name": "family-entrepreneur-portal",
+  "version": "1.0.0",
+  "description": "A portal for our family's businesses — questionnaire, admin dashboard, and profile generator.",
+  "private": true,
+  "type": "module"
+}

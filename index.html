@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Family Entrepreneur Spotlight — Share Your Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+  :root {
+    --paper:       #f4ede2;
+    --paper-deep:  #ebe1d1;
+    --ink:         #1f1b16;
+    --ink-soft:    #4a4238;
+    --ink-mute:    #7a6f61;
+    --accent:      #b8453a;
+    --accent-deep: #8f2d24;
+    --gold:        #c89434;
+    --line:        #2a241d;
+    --shadow:      0 1px 0 rgba(31,27,22,0.08), 0 20px 40px -20px rgba(31,27,22,0.25);
+    --radius:      2px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(200,148,52,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(184,69,58,0.04) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  /* paper grain */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.10 0 0 0 0 0.08 0 0 0 0.12 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  .display {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  /* ============ HEADER ============ */
+  header.masthead {
+    padding: 32px clamp(24px, 5vw, 64px) 0;
+    display: flex; justify-content: space-between; align-items: center;
+    position: relative; z-index: 2;
+  }
+  .mark {
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 14px; letter-spacing: 0.3em; text-transform: uppercase;
+  }
+  .mark span { color: var(--accent); }
+  .session {
+    font-size: 12px; color: var(--ink-mute);
+    letter-spacing: 0.15em; text-transform: uppercase;
+    display: flex; gap: 14px; align-items: center;
+  }
+  .session button {
+    background: none; border: none; color: var(--ink-mute);
+    font: inherit; cursor: pointer; border-bottom: 1px solid transparent;
+    padding: 2px 0; letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .session button:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+  /* ============ HERO ============ */
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(60px, 12vh, 120px) clamp(24px, 5vw, 64px) clamp(40px, 8vh, 80px);
+    position: relative; z-index: 2;
+  }
+  .hero .eyebrow {
+    font-size: 12px; letter-spacing: 0.4em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 24px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .hero .eyebrow::before {
+    content: ""; width: 40px; height: 1px; background: var(--accent);
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(44px, 8vw, 96px);
+    line-height: 0.95;
+    font-weight: 300;
+    letter-spacing: -0.035em;
+    margin-bottom: 28px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .hero .lede {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(18px, 2vw, 22px);
+    line-height: 1.5;
+    font-weight: 300;
+    color: var(--ink-soft);
+    max-width: 640px;
+    margin-bottom: 40px;
+  }
+  .hero .meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 32px;
+    max-width: 720px;
+    padding-top: 32px;
+    border-top: 1px solid var(--ink);
+  }
+  .hero .meta .item .label {
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--ink-mute); margin-bottom: 6px;
+  }
+  .hero .meta .item .val {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+  }
+
+  .cta-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 40px; }
+
+  /* ============ BUTTONS ============ */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 18px 32px;
+    border: none; cursor: pointer;
+    transition: all 0.25s ease;
+    font-weight: 500;
+  }
+  .btn-primary {
+    background: var(--ink); color: var(--paper);
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+  .btn-ghost {
+    background: transparent; color: var(--ink);
+    border: 1px solid var(--ink);
+  }
+  .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+  .btn .arrow { transition: transform 0.25s; }
+  .btn:hover .arrow { transform: translateX(4px); }
+
+  /* ============ QUESTIONNAIRE ============ */
+  .questionnaire {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px clamp(24px, 5vw, 64px) 120px;
+    position: relative; z-index: 2;
+    display: none;
+  }
+  .questionnaire.active { display: block; }
+
+  .progress-rail {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 56px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(31,27,22,0.15);
+  }
+  .progress-rail .count {
+    font-family: 'Fraunces', serif;
+    font-size: 14px; font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+  .progress-rail .bar {
+    flex: 1; height: 1px; background: rgba(31,27,22,0.15);
+    position: relative; overflow: hidden;
+  }
+  .progress-rail .bar::after {
+    content: ""; position: absolute; inset: 0;
+    background: var(--accent);
+    width: var(--pct, 0%);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .progress-rail .section-name {
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  .step {
+    display: none;
+    animation: fadeUp 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .step.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-eyebrow {
+    font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--ink-mute); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .step-eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+  .step h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.1;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+  .step .helper {
+    font-family: 'Fraunces', serif;
+    font-size: 17px; font-style: italic;
+    color: var(--ink-mute);
+    margin-bottom: 36px;
+    line-height: 1.5;
+  }
+
+  /* inputs */
+  .field { margin-bottom: 32px; }
+  .field label {
+    display: block;
+    font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .field input[type=text],
+  .field input[type=email],
+  .field input[type=url],
+  .field textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--ink);
+    padding: 10px 0 12px;
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    color: var(--ink);
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+  .field textarea { min-height: 140px; font-size: 17px; line-height: 1.55; }
+  .field input:focus, .field textarea:focus {
+    outline: none; border-bottom-color: var(--accent); border-bottom-width: 2px;
+  }
+  .field input::placeholder, .field textarea::placeholder {
+    color: var(--ink-mute); font-style: italic; font-weight: 300;
+  }
+  .field .hint {
+    font-size: 13px; color: var(--ink-mute);
+    margin-top: 8px; font-style: italic;
+  }
+
+  .nav-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 48px; padding-top: 32px;
+    border-top: 1px solid rgba(31,27,22,0.15);
+    gap: 16px; flex-wrap: wrap;
+  }
+  .save-status {
+    font-size: 12px; color: var(--ink-mute); letter-spacing: 0.1em;
+    text-transform: uppercase; font-style: italic;
+  }
+  .save-status.saved { color: var(--gold); }
+
+  /* file upload */
+  .photo-drop {
+    border: 1.5px dashed rgba(31,27,22,0.3);
+    padding: 40px 24px; text-align: center;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .photo-drop:hover {
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.5);
+  }
+  .photo-drop.dragover {
+    border-color: var(--accent); background: rgba(184,69,58,0.08);
+  }
+  .photo-drop .icon { font-family: 'Fraunces', serif; font-size: 48px; color: var(--ink-mute); line-height: 1; margin-bottom: 12px; }
+  .photo-drop .prim { font-family: 'Fraunces', serif; font-size: 18px; margin-bottom: 4px; }
+  .photo-drop .sec { font-size: 13px; color: var(--ink-mute); }
+  .photo-drop input[type=file] { display: none; }
+  .photo-preview {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px; margin-top: 20px;
+  }
+  .photo-preview .p {
+    position: relative; aspect-ratio: 1; overflow: hidden;
+    background: var(--paper-deep);
+  }
+  .photo-preview .p img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-preview .p .rm {
+    position: absolute; top: 6px; right: 6px;
+    background: var(--ink); color: var(--paper);
+    width: 24px; height: 24px; border: none; cursor: pointer;
+    font-size: 14px; line-height: 1;
+  }
+
+  /* ============ SUCCESS SCREEN ============ */
+  .success {
+    max-width: 720px; margin: 0 auto;
+    padding: clamp(80px, 15vh, 140px) clamp(24px, 5vw, 64px);
+    text-align: center;
+    position: relative; z-index: 2;
+    display: none;
+  }
+  .success.active { display: block; }
+  .success .ornament {
+    font-family: 'Fraunces', serif; font-size: 60px; color: var(--accent);
+    margin-bottom: 32px; line-height: 1;
+  }
+  .success h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 400; line-height: 1.1;
+    letter-spacing: -0.02em; margin-bottom: 24px;
+  }
+  .success h2 em { font-style: italic; color: var(--accent); }
+  .success p {
+    font-family: 'Fraunces', serif; font-size: 20px;
+    color: var(--ink-soft); line-height: 1.6; font-weight: 300;
+    max-width: 520px; margin: 0 auto 40px;
+  }
+
+  /* ============ MODAL ============ */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(31,27,22,0.6);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 24px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--paper); max-width: 460px; width: 100%;
+    padding: 48px 40px; box-shadow: var(--shadow);
+    position: relative;
+  }
+  .modal h3 {
+    font-family: 'Fraunces', serif; font-size: 28px; font-weight: 400;
+    letter-spacing: -0.01em; margin-bottom: 12px;
+  }
+  .modal p { color: var(--ink-soft); margin-bottom: 24px; font-size: 15px; }
+  .modal .field { margin-bottom: 24px; }
+  .modal .close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none; font-size: 20px; cursor: pointer;
+    color: var(--ink-mute); line-height: 1;
+  }
+  .modal .feedback {
+    font-size: 13px; margin-top: 14px;
+    padding: 10px 14px;
+    background: rgba(200, 148, 52, 0.15);
+    border-left: 2px solid var(--gold);
+    color: var(--ink-soft);
+  }
+  .modal .feedback.error {
+    background: rgba(184,69,58,0.1);
+    border-left-color: var(--accent);
+  }
+
+  /* loader */
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 1.5px solid currentColor; border-top-color: transparent;
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ============ FOOTER ============ */
+  footer {
+    padding: 32px clamp(24px, 5vw, 64px);
+    border-top: 1px solid rgba(31,27,22,0.15);
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--ink-mute);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    position: relative; z-index: 2;
+    flex-wrap: wrap; gap: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .nav-row .btn { flex: 1; justify-content: center; padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="mark">Family &mdash; <span>Est. Spotlight</span></div>
+  <div class="session">
+    <span id="sessionEmail"></span>
+    <button id="signOutBtn" style="display:none">Sign out</button>
+    <button id="resumeBtn">Resume progress</button>
+  </div>
+</header>
+
+<!-- ============ LANDING ============ -->
+<main class="hero" id="landing">
+  <div class="eyebrow">An invitation</div>
+  <h1>Tell us the<br/>story of your<br/><em>business.</em></h1>
+  <p class="lede">
+    We're gathering the quiet, remarkable ventures our family has built —
+    so the next generation knows what's possible, and who to turn to.
+    Your answers become a profile featured on our Family Spotlight.
+  </p>
+
+  <div class="cta-row">
+    <button class="btn btn-primary" id="beginBtn">
+      Begin the questionnaire <span class="arrow">&rarr;</span>
+    </button>
+    <button class="btn btn-ghost" id="heroResumeBtn">
+      Continue where I left off
+    </button>
+  </div>
+
+  <div class="meta">
+    <div class="item">
+      <div class="label">Time needed</div>
+      <div class="val">15&ndash;20 minutes</div>
+    </div>
+    <div class="item">
+      <div class="label">Save &amp; resume</div>
+      <div class="val">Always available</div>
+    </div>
+    <div class="item">
+      <div class="label">Questions</div>
+      <div class="val">Four short sections</div>
+    </div>
+  </div>
+</main>
+
+<!-- ============ QUESTIONNAIRE ============ -->
+<main class="questionnaire" id="questionnaire">
+  <div class="progress-rail">
+    <span class="count" id="stepCount">01 / 12</span>
+    <div class="bar" id="progressBar"></div>
+    <span class="section-name" id="sectionName">The basics</span>
+  </div>
+
+  <!-- Steps injected by JS -->
+  <div id="stepContainer"></div>
+
+  <div class="nav-row">
+    <div style="display:flex; gap:12px; align-items:center;">
+      <button class="btn btn-ghost" id="prevBtn">&larr; Back</button>
+      <span class="save-status" id="saveStatus"></span>
+    </div>
+    <button class="btn btn-primary" id="nextBtn">
+      Continue <span class="arrow">&rarr;</span>
+    </button>
+  </div>
+</main>
+
+<!-- ============ SUCCESS ============ -->
+<main class="success" id="success">
+  <div class="ornament">&#10042;</div>
+  <h2>Thank you, <em>truly.</em></h2>
+  <p>
+    Your responses are in. Our team will craft a profile from your words
+    and share it back for your review before publishing. We'll be in touch soon.
+  </p>
+  <button class="btn btn-ghost" onclick="location.reload()">Return home</button>
+</main>
+
+<footer>
+  <span>&copy; Family Entrepreneur Spotlight</span>
+  <span>A portal for our family, by our family</span>
+</footer>
+
+<!-- ============ AUTH MODAL ============ -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="close" id="closeAuth">&times;</button>
+    <h3 id="authTitle">Save your progress</h3>
+    <p id="authCopy">Enter your email and we'll send you a magic link. Click it to continue — no password needed.</p>
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" id="authEmail" placeholder="you@example.com" />
+    </div>
+    <button class="btn btn-primary" id="sendMagicLink" style="width:100%; justify-content:center;">
+      Send magic link
+    </button>
+    <div class="feedback" id="authFeedback" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// QUESTIONNAIRE DEFINITION
+// ============================================================
+const QUESTIONS = [
+  // Section 1: The basics
+  { section: "The basics", key: "owner_name", label: "Your name",
+    type: "text", placeholder: "First and last name",
+    eyebrow: "Let's start simple", title: "Who are we speaking with?",
+    helper: "This will appear on your profile page." },
+
+  { section: "The basics", key: "business_name", label: "Name of your business",
+    type: "text", placeholder: "The name you're proud of",
+    eyebrow: "About your venture", title: "What is your business called?",
+    helper: "Exactly as you'd like it printed — capitalization and all." },
+
+  { section: "The basics", key: "one_liner", label: "In one sentence, what do you do?",
+    type: "text", placeholder: "We help ___ by ___",
+    eyebrow: "The elevator pitch", title: "Describe your business in a sentence.",
+    helper: "Imagine explaining it to a cousin at a family dinner." },
+
+  // Section 2: Spotlight interview
+  { section: "Spotlight interview", key: "intro", label: "Introduce yourself and your business",
+    type: "textarea", placeholder: "A paragraph or two about you and what you've built...",
+    eyebrow: "Spotlight interview", title: "Introduce yourself.",
+    helper: "Who are you, what did you build, and how long has it been going?" },
+
+  { section: "Spotlight interview", key: "inspiration", label: "What inspired you to start?",
+    type: "textarea", placeholder: "The spark, the moment, the people who shaped this...",
+    eyebrow: "Spotlight interview", title: "What inspired this venture?",
+    helper: "And how did your family — past or present — influence the journey?" },
+
+  { section: "Spotlight interview", key: "purpose", label: "The problem or need you're addressing",
+    type: "textarea", placeholder: "What does the world gain from your business existing?",
+    eyebrow: "Spotlight interview", title: "What is this business really about?",
+    helper: "Beyond the products or services — what's the real purpose?" },
+
+  { section: "Spotlight interview", key: "hopes", label: "What do you hope family takes away?",
+    type: "textarea", placeholder: "Lessons, inspiration, possibilities...",
+    eyebrow: "Spotlight interview", title: "What do you hope younger family members learn from your story?",
+    helper: "This is what we'll likely pull into the presentation." },
+
+  { section: "Spotlight interview", key: "support", label: "How can family best support you?",
+    type: "textarea", placeholder: "Referrals, feedback, collaboration, a phone call...",
+    eyebrow: "Spotlight interview", title: "How can our family best support your business?",
+    helper: "Be specific — it helps us help you." },
+
+  // Section 3: Behind the scenes
+  { section: "Behind the scenes", key: "routine", label: "One part of your daily routine",
+    type: "textarea", placeholder: "The small ritual that keeps things moving...",
+    eyebrow: "A day in the life", title: "Walk us through a slice of your routine.",
+    helper: "Morning coffee, end-of-day review, weekly rhythm — anything that captures the rhythm." },
+
+  { section: "Behind the scenes", key: "challenge", label: "A challenge you've overcome",
+    type: "textarea", placeholder: "What nearly broke it, and how you pulled through...",
+    eyebrow: "A day in the life", title: "Share a challenge you've overcome.",
+    helper: "The honest version, not the polished one. We'll edit together if needed." },
+
+  { section: "Behind the scenes", key: "win", label: "A small win you're proud of",
+    type: "textarea", placeholder: "A recent moment that made you smile at the work...",
+    eyebrow: "A day in the life", title: "Share a small win.",
+    helper: "Doesn't need to be a milestone — just something real." },
+
+  // Section 4: Lessons & advice
+  { section: "Lessons &amp; advice", key: "lesson", label: "A lesson you wish you'd known earlier",
+    type: "textarea", placeholder: "The thing you tell yourself three years ago...",
+    eyebrow: "Lessons &amp; advice", title: "What do you wish you'd known earlier?",
+    helper: "One lesson, honestly told." },
+
+  { section: "Lessons &amp; advice", key: "principle", label: "A principle, habit, or mindset that's helped",
+    type: "textarea", placeholder: "The rule you keep coming back to...",
+    eyebrow: "Lessons &amp; advice", title: "What principle has shaped your success?",
+    helper: "And why has it worked for you?" },
+
+  { section: "Lessons &amp; advice", key: "advice", label: "Advice for a family member starting out",
+    type: "textarea", placeholder: "What you'd say to a cousin with a dream and no plan...",
+    eyebrow: "Lessons &amp; advice", title: "Advice for the next generation.",
+    helper: "This is the one we'll frame on the wall." },
+
+  // Section 5: Photos & contact
+  { section: "Photos &amp; contact", key: "photos", label: "Behind-the-scenes photos",
+    type: "photos",
+    eyebrow: "Almost done", title: "Share 1&ndash;2 photos of you at work.",
+    helper: "Your workspace, a product shot, a candid moment. Anything that captures the feel." },
+
+  { section: "Photos &amp; contact", key: "contact", label: "How people can find you",
+    type: "contact",
+    eyebrow: "Almost done", title: "Where can people find your business?",
+    helper: "Fill in whatever applies. We'll only display what you share." },
+
+  { section: "Photos &amp; contact", key: "open_to", label: "Open to mentorship or internships?",
+    type: "textarea", placeholder: "Yes/no, and what kind of learner would thrive with you...",
+    eyebrow: "Almost done", title: "Are you open to mentoring a younger family member?",
+    helper: "Totally optional — skip if not relevant right now." },
+];
+
+// ============================================================
+// APP STATE
+// ============================================================
+const cfg = window.APP_CONFIG;
+const sb = supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+
+let state = {
+  currentStep: 0,
+  answers: {},
+  photos: [],
+  contact: {},
+  submissionId: null,
+  email: null,
+  saveTimer: null,
+};
+
+// ============================================================
+// AUTH
+// ============================================================
+async function checkAuth() {
+  const { data } = await sb.auth.getSession();
+  if (data.session) {
+    state.email = data.session.user.email;
+    document.getElementById('sessionEmail').textContent = state.email;
+    document.getElementById('signOutBtn').style.display = 'inline';
+    await loadExistingSubmission();
+    // if they have existing progress, show a subtle note
+  }
+}
+
+async function loadExistingSubmission() {
+  const { data, error } = await sb
+    .from('submissions')
+    .select('*')
+    .eq('email', state.email)
+    .order('updated_at', { ascending: false })
+    .limit(1);
+
+  if (!error && data && data.length > 0) {
+    const sub = data[0];
+    state.submissionId = sub.id;
+    state.answers = sub.answers || {};
+    state.photos = sub.photos || [];
+    state.contact = (sub.answers && sub.answers.contact) || {};
+
+    if (sub.status === 'submitted' || sub.status === 'published') {
+      // already submitted — show success
+      showSuccess();
+      return;
+    }
+
+    // Restore UI if they have answers
+    if (Object.keys(state.answers).length > 0) {
+      const lastAnswered = QUESTIONS.findIndex(q => !state.answers[q.key]);
+      state.currentStep = lastAnswered === -1 ? QUESTIONS.length - 1 : Math.max(0, lastAnswered);
+    }
+  }
+}
+
+async function openAuthModal(mode = 'save') {
+  const modal = document.getElementById('authModal');
+  const title = document.getElementById('authTitle');
+  const copy = document.getElementById('authCopy');
+  if (mode === 'resume') {
+    title.textContent = 'Resume your progress';
+    copy.textContent = "Enter the email you used last time. We'll send you a magic link to pick up where you left off.";
+  } else {
+    title.textContent = 'Save your progress';
+    copy.textContent = "Enter your email and we'll send you a magic link. Click it to continue — no password needed.";
+  }
+  modal.classList.add('active');
+  document.getElementById('authEmail').focus();
+}
+
+document.getElementById('closeAuth').onclick = () => {
+  document.getElementById('authModal').classList.remove('active');
+};
+
+document.getElementById('sendMagicLink').onclick = async () => {
+  const email = document.getElementById('authEmail').value.trim().toLowerCase();
+  const fb = document.getElementById('authFeedback');
+  const btn = document.getElementById('sendMagicLink');
+
+  if (!email || !email.includes('@')) {
+    fb.textContent = 'Please enter a valid email.';
+    fb.className = 'feedback error'; fb.style.display = 'block';
+    return;
+  }
+
+  btn.innerHTML = '<span class="spinner"></span> Sending...';
+  btn.disabled = true;
+
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href.split('#')[0].split('?')[0] }
+  });
+
+  if (error) {
+    fb.textContent = 'Something went wrong: ' + error.message;
+    fb.className = 'feedback error'; fb.style.display = 'block';
+  } else {
+    fb.innerHTML = '<strong>Check your email.</strong> We sent a magic link to <em>' + email + '</em>. Click it to continue.';
+    fb.className = 'feedback'; fb.style.display = 'block';
+  }
+  btn.innerHTML = 'Send magic link';
+  btn.disabled = false;
+};
+
+document.getElementById('signOutBtn').onclick = async () => {
+  await sb.auth.signOut();
+  location.reload();
+};
+
+document.getElementById('resumeBtn').onclick = () => openAuthModal('resume');
+document.getElementById('heroResumeBtn').onclick = () => openAuthModal('resume');
+
+// ============================================================
+// QUESTIONNAIRE UI
+// ============================================================
+document.getElementById('beginBtn').onclick = async () => {
+  if (!state.email) {
+    openAuthModal('save');
+    return;
+  }
+  startQuestionnaire();
+};
+
+function startQuestionnaire() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('questionnaire').classList.add('active');
+  renderStep();
+}
+
+function showSuccess() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('questionnaire').classList.remove('active');
+  document.getElementById('success').classList.add('active');
+}
+
+function renderStep() {
+  const q = QUESTIONS[state.currentStep];
+  const pct = ((state.currentStep + 1) / QUESTIONS.length) * 100;
+  const num = String(state.currentStep + 1).padStart(2, '0');
+  const total = String(QUESTIONS.length).padStart(2, '0');
+
+  document.getElementById('stepCount').textContent = `${num} / ${total}`;
+  document.getElementById('sectionName').innerHTML = q.section;
+  document.getElementById('progressBar').style.setProperty('--pct', pct + '%');
+
+  const container = document.getElementById('stepContainer');
+
+  let inputHtml = '';
+  if (q.type === 'text') {
+    const val = state.answers[q.key] || '';
+    inputHtml = `
+      <div class="field">
+        <label>${q.label}</label>
+        <input type="text" id="input_${q.key}" placeholder="${q.placeholder}" value="${escapeHtml(val)}" />
+      </div>
+    `;
+  } else if (q.type === 'textarea') {
+    const val = state.answers[q.key] || '';
+    inputHtml = `
+      <div class="field">
+        <label>${q.label}</label>
+        <textarea id="input_${q.key}" placeholder="${q.placeholder}">${escapeHtml(val)}</textarea>
+      </div>
+    `;
+  } else if (q.type === 'photos') {
+    inputHtml = renderPhotoUploader();
+  } else if (q.type === 'contact') {
+    inputHtml = renderContactFields();
+  }
+
+  container.innerHTML = `
+    <div class="step active">
+      <div class="step-eyebrow"><span class="dot"></span> ${q.eyebrow}</div>
+      <h2>${q.title}</h2>
+      <p class="helper">${q.helper}</p>
+      ${inputHtml}
+    </div>
+  `;
+
+  // bind input listeners
+  if (q.type === 'text' || q.type === 'textarea') {
+    const input = document.getElementById('input_' + q.key);
+    input.focus();
+    input.addEventListener('input', () => {
+      state.answers[q.key] = input.value;
+      scheduleSave();
+    });
+  } else if (q.type === 'photos') {
+    bindPhotoUploader();
+  } else if (q.type === 'contact') {
+    bindContactFields();
+  }
+
+  // nav button states
+  document.getElementById('prevBtn').disabled = state.currentStep === 0;
+  const nextBtn = document.getElementById('nextBtn');
+  if (state.currentStep === QUESTIONS.length - 1) {
+    nextBtn.innerHTML = 'Submit responses <span class="arrow">&rarr;</span>';
+  } else {
+    nextBtn.innerHTML = 'Continue <span class="arrow">&rarr;</span>';
+  }
+}
+
+function renderPhotoUploader() {
+  return `
+    <div class="field">
+      <label>Upload photos (optional, max 4)</label>
+      <label for="photoInput" class="photo-drop" id="photoDrop">
+        <div class="icon">+</div>
+        <div class="prim">Click or drag to upload</div>
+        <div class="sec">JPG, PNG, or WebP &middot; up to 5MB each</div>
+        <input type="file" id="photoInput" accept="image/*" multiple />
+      </label>
+      <div class="photo-preview" id="photoPreview"></div>
+    </div>
+  `;
+}
+
+function bindPhotoUploader() {
+  const drop = document.getElementById('photoDrop');
+  const input = document.getElementById('photoInput');
+
+  ['dragenter','dragover'].forEach(e => drop.addEventListener(e, ev => {
+    ev.preventDefault(); drop.classList.add('dragover');
+  }));
+  ['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => {
+    ev.preventDefault(); drop.classList.remove('dragover');
+  }));
+  drop.addEventListener('drop', ev => {
+    handleFiles(ev.dataTransfer.files);
+  });
+  input.addEventListener('change', ev => {
+    handleFiles(ev.target.files);
+  });
+
+  renderPhotoPreviews();
+}
+
+async function handleFiles(files) {
+  for (const file of files) {
+    if (state.photos.length >= 4) break;
+    if (!file.type.startsWith('image/')) continue;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File too large: ' + file.name);
+      continue;
+    }
+
+    // upload to Supabase storage
+    const ext = file.name.split('.').pop();
+    const path = `${state.email}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const { error } = await sb.storage.from('business-photos').upload(path, file);
+    if (error) {
+      alert('Upload failed: ' + error.message);
+      continue;
+    }
+    const { data: pub } = sb.storage.from('business-photos').getPublicUrl(path);
+    state.photos.push({ url: pub.publicUrl, path, caption: '' });
+    renderPhotoPreviews();
+    scheduleSave();
+  }
+}
+
+function renderPhotoPreviews() {
+  const preview = document.getElementById('photoPreview');
+  if (!preview) return;
+  preview.innerHTML = state.photos.map((p, i) => `
+    <div class="p">
+      <img src="${p.url}" alt="" />
+      <button class="rm" onclick="removePhoto(${i})" title="Remove">&times;</button>
+    </div>
+  `).join('');
+}
+
+window.removePhoto = async (i) => {
+  const p = state.photos[i];
+  if (p.path) await sb.storage.from('business-photos').remove([p.path]);
+  state.photos.splice(i, 1);
+  renderPhotoPreviews();
+  scheduleSave();
+};
+
+function renderContactFields() {
+  const c = state.contact || {};
+  return `
+    <div class="field"><label>Public email (optional)</label>
+      <input type="email" id="c_email" placeholder="hello@yourbusiness.com" value="${escapeHtml(c.email||'')}" />
+    </div>
+    <div class="field"><label>Website</label>
+      <input type="url" id="c_website" placeholder="https://..." value="${escapeHtml(c.website||'')}" />
+    </div>
+    <div class="field"><label>Instagram</label>
+      <input type="text" id="c_instagram" placeholder="@handle" value="${escapeHtml(c.instagram||'')}" />
+    </div>
+    <div class="field"><label>Other / notes</label>
+      <input type="text" id="c_other" placeholder="LinkedIn, Facebook, phone, etc." value="${escapeHtml(c.other||'')}" />
+    </div>
+  `;
+}
+
+function bindContactFields() {
+  ['email','website','instagram','other'].forEach(k => {
+    const el = document.getElementById('c_' + k);
+    if (el) el.addEventListener('input', () => {
+      state.contact[k] = el.value;
+      state.answers.contact = state.contact;
+      scheduleSave();
+    });
+  });
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[ch]);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+document.getElementById('prevBtn').onclick = () => {
+  if (state.currentStep > 0) { state.currentStep--; renderStep(); }
+};
+
+document.getElementById('nextBtn').onclick = async () => {
+  // require basics fields
+  const q = QUESTIONS[state.currentStep];
+  if (q.key === 'owner_name' || q.key === 'business_name' || q.key === 'one_liner') {
+    if (!state.answers[q.key] || state.answers[q.key].trim().length < 1) {
+      alert('Please fill in this field to continue.');
+      return;
+    }
+  }
+
+  if (state.currentStep === QUESTIONS.length - 1) {
+    await submitFinal();
+  } else {
+    state.currentStep++;
+    renderStep();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+};
+
+// ============================================================
+// SAVE
+// ============================================================
+function scheduleSave() {
+  clearTimeout(state.saveTimer);
+  const status = document.getElementById('saveStatus');
+  status.textContent = 'Saving...';
+  status.classList.remove('saved');
+  state.saveTimer = setTimeout(saveProgress, 800);
+}
+
+async function saveProgress() {
+  if (!state.email) return;
+  const payload = {
+    email: state.email,
+    owner_name: state.answers.owner_name || null,
+    business_name: state.answers.business_name || null,
+    answers: state.answers,
+    photos: state.photos,
+    status: 'draft',
+  };
+
+  let result;
+  if (state.submissionId) {
+    result = await sb.from('submissions').update(payload).eq('id', state.submissionId).select().single();
+  } else {
+    result = await sb.from('submissions').insert(payload).select().single();
+    if (result.data) state.submissionId = result.data.id;
+  }
+
+  const status = document.getElementById('saveStatus');
+  if (result.error) {
+    status.textContent = 'Save failed';
+    console.error(result.error);
+  } else {
+    const t = new Date();
+    status.textContent = 'Saved ' + t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    status.classList.add('saved');
+  }
+}
+
+async function submitFinal() {
+  await saveProgress();
+  if (!state.submissionId) {
+    alert('Could not save. Please try again.');
+    return;
+  }
+  const { error } = await sb.from('submissions')
+    .update({ status: 'submitted', submitted_at: new Date().toISOString() })
+    .eq('id', state.submissionId);
+  if (error) { alert('Submit failed: ' + error.message); return; }
+  showSuccess();
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+(async () => {
+  // Handle magic link returns
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    // supabase-js picks this up automatically
+    await new Promise(r => setTimeout(r, 500));
+  }
+
+  await checkAuth();
+
+  // If returning with a session and progress exists, skip straight into questionnaire
+  if (state.email && Object.keys(state.answers).length > 0) {
+    startQuestionnaire();
+  }
+
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && !state.email) {
+      location.reload();
+    }
+  });
+})();
+</script>
+</body>
+</html>

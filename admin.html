@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin &mdash; Family Spotlight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+  :root {
+    --paper:       #f4ede2;
+    --paper-deep:  #ebe1d1;
+    --ink:         #1f1b16;
+    --ink-soft:    #4a4238;
+    --ink-mute:    #7a6f61;
+    --accent:      #b8453a;
+    --accent-deep: #8f2d24;
+    --gold:        #c89434;
+    --green:       #5a7a3e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .display { font-family: 'Fraunces', serif; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ========= LOGIN GATE ========= */
+  .gate {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .gate-card {
+    max-width: 400px; width: 100%;
+    padding: 48px 40px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+  }
+  .gate-card h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .gate-card p { color: var(--ink-mute); margin-bottom: 28px; }
+  .gate-card input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    font-family: inherit;
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+  .gate-card input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .gate-card button {
+    width: 100%;
+    padding: 14px;
+    background: var(--ink); color: var(--paper);
+    border: none; cursor: pointer;
+    font-family: inherit;
+    font-size: 13px; letter-spacing: 0.15em;
+    text-transform: uppercase; font-weight: 500;
+  }
+  .gate-card button:hover { background: var(--accent); }
+  .gate-card .err {
+    color: var(--accent);
+    font-size: 13px;
+    margin-top: 12px;
+  }
+
+  /* ========= APP LAYOUT ========= */
+  .app { display: none; min-height: 100vh; }
+  .app.active { display: grid; grid-template-columns: 340px 1fr; }
+
+  aside {
+    background: var(--paper-deep);
+    border-right: 1px solid rgba(31,27,22,0.15);
+    padding: 24px;
+    max-height: 100vh;
+    overflow-y: auto;
+    position: sticky; top: 0;
+  }
+  aside .title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  aside .sub {
+    font-size: 11px; color: var(--ink-mute);
+    letter-spacing: 0.15em; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .filter-tabs {
+    display: flex; gap: 4px; margin-bottom: 16px;
+  }
+  .filter-tabs button {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: transparent; border: 1px solid rgba(31,27,22,0.2);
+    cursor: pointer; font-family: inherit;
+    color: var(--ink-soft);
+  }
+  .filter-tabs button.active {
+    background: var(--ink); color: var(--paper); border-color: var(--ink);
+  }
+
+  .submission-list { display: flex; flex-direction: column; gap: 8px; }
+  .sub-card {
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid rgba(31,27,22,0.15);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sub-card:hover { border-color: var(--ink); }
+  .sub-card.active { border-color: var(--accent); border-left-width: 3px; padding-left: 14px; background: rgba(184,69,58,0.04); }
+  .sub-card .name {
+    font-family: 'Fraunces', serif;
+    font-size: 17px; font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .sub-card .owner { font-size: 12px; color: var(--ink-mute); margin-bottom: 8px; }
+  .sub-card .meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+  .badge {
+    padding: 2px 8px;
+    font-size: 10px; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .badge.draft     { background: rgba(122,111,97,0.2); color: var(--ink-mute); }
+  .badge.submitted { background: rgba(200,148,52,0.2); color: var(--gold); }
+  .badge.published { background: rgba(90,122,62,0.2); color: var(--green); }
+  .sub-card .time { color: var(--ink-mute); }
+
+  main.content {
+    padding: 32px 40px;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .empty-state {
+    display: flex; align-items: center; justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: var(--ink-mute);
+  }
+  .empty-state .inner {
+    max-width: 320px;
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-style: italic;
+  }
+
+  /* ========= DETAIL VIEW ========= */
+  .detail .header {
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(31,27,22,0.15);
+    margin-bottom: 32px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;
+    flex-wrap: wrap;
+  }
+  .detail h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+  .detail .owner { color: var(--ink-mute); font-size: 14px; }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(31,27,22,0.15);
+  }
+  .tabs button {
+    padding: 10px 16px;
+    font: inherit; font-size: 13px;
+    background: transparent; border: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+  }
+  .tabs button.active {
+    color: var(--ink); border-bottom-color: var(--accent);
+    font-weight: 500;
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* answers view */
+  .qa-block { margin-bottom: 28px; }
+  .qa-block .q {
+    font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+  .qa-block .a {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    padding: 12px 16px;
+    background: var(--paper-deep);
+    border-left: 2px solid var(--accent);
+  }
+
+  .photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px; margin-top: 12px;
+  }
+  .photos-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+
+  /* buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px;
+    font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: 1px solid var(--ink);
+    background: transparent;
+    cursor: pointer; font-family: inherit;
+    font-weight: 500;
+  }
+  .btn:hover { background: var(--ink); color: var(--paper); }
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-accent { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+  .btn-accent:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .actions-bar {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+
+  /* profile editor */
+  .editor-field { margin-bottom: 20px; }
+  .editor-field label {
+    display: block;
+    font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .editor-field input, .editor-field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(31,27,22,0.25);
+    background: var(--paper);
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--ink);
+    resize: vertical;
+  }
+  .editor-field textarea { min-height: 100px; }
+  .editor-field input:focus, .editor-field textarea:focus {
+    outline: 2px solid var(--accent); outline-offset: -1px;
+    border-color: transparent;
+  }
+
+  .section-editor {
+    padding: 16px;
+    background: var(--paper-deep);
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .section-editor .rm-section {
+    position: absolute; top: 10px; right: 10px;
+    background: transparent; border: none; cursor: pointer;
+    color: var(--ink-mute); font-size: 18px; line-height: 1;
+  }
+  .section-editor .rm-section:hover { color: var(--accent); }
+
+  .add-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px dashed rgba(31,27,22,0.3);
+    color: var(--ink-mute);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .add-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+  .preview-frame {
+    width: 100%;
+    height: 800px;
+    border: 1px solid rgba(31,27,22,0.25);
+    background: #fff;
+  }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    padding: 12px 20px;
+    background: var(--ink); color: var(--paper);
+    font-size: 13px;
+    z-index: 100;
+    transform: translateY(200%);
+    transition: transform 0.3s;
+  }
+  .toast.show { transform: translateY(0); }
+
+  .spinner {
+    display: inline-block; width: 12px; height: 12px;
+    border: 1.5px solid currentColor; border-top-color: transparent;
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(31,27,22,0.6);
+    display: none; align-items: center; justify-content: center;
+    z-index: 200; padding: 24px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: var(--paper); max-width: 820px; width: 100%; max-height: 90vh;
+    padding: 32px;
+    overflow-y: auto;
+    position: relative;
+  }
+  .modal-box pre {
+    background: #1f1b16; color: #f4ede2;
+    padding: 16px; overflow: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; line-height: 1.5;
+    max-height: 500px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========= GATE ========= -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <h1>Admin &mdash; Family Spotlight</h1>
+    <p>Enter the team password to continue.</p>
+    <input type="password" id="pwd" placeholder="Password" />
+    <button id="enterBtn">Enter</button>
+    <div class="err" id="gateErr" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ========= APP ========= -->
+<div class="app" id="app">
+  <aside>
+    <div class="title">Submissions</div>
+    <div class="sub">Family Entrepreneur Spotlight</div>
+
+    <div class="filter-tabs">
+      <button class="active" data-filter="all">All</button>
+      <button data-filter="submitted">New</button>
+      <button data-filter="draft">Drafts</button>
+      <button data-filter="published">Live</button>
+    </div>
+
+    <div class="submission-list" id="submissionList">
+      <div style="padding: 20px 0; color: var(--ink-mute); font-size: 13px; text-align: center;">
+        Loading...
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="empty-state" id="emptyState">
+      <div class="inner">
+        &ldquo;Select a submission from the left to review, edit, and publish.&rdquo;
+      </div>
+    </div>
+
+    <div class="detail" id="detail" style="display:none;">
+      <div class="header">
+        <div>
+          <h1 id="dBusiness">Business Name</h1>
+          <div class="owner" id="dOwner">owner &mdash; email</div>
+        </div>
+        <div class="actions-bar" id="dActions"></div>
+      </div>
+
+      <div class="tabs">
+        <button class="active" data-tab="answers">Answers</button>
+        <button data-tab="profile">Profile Copy</button>
+        <button data-tab="preview">Preview</button>
+      </div>
+
+      <div class="tab-content active" id="tab-answers"></div>
+      <div class="tab-content" id="tab-profile"></div>
+      <div class="tab-content" id="tab-preview"></div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ========= EXPORT MODAL ========= -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal-box">
+    <h2 class="display" style="font-weight:400; font-size:26px; margin-bottom:8px;">Exported HTML</h2>
+    <p style="color: var(--ink-mute); margin-bottom: 16px;">Copy this and paste into your site. Includes inline styles.</p>
+    <div style="display:flex; gap:10px; margin-bottom:16px;">
+      <button class="btn btn-primary" id="copyHtml">Copy to clipboard</button>
+      <button class="btn" id="downloadHtml">Download .html</button>
+      <button class="btn" id="closeExport">Close</button>
+    </div>
+    <pre id="exportPre"></pre>
+  </div>
+</div>
+
+<!-- profile.html template stored as a string for export -->
+<script id="profileTemplate" type="text/template"></script>
+
+<script>
+const cfg = window.APP_CONFIG;
+const sb = supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+
+// NOTE on admin auth: the gate password is for soft access only.
+// Real data protection comes from RLS + the AI generation endpoint.
+// For this version, admin actions use the anon key — to enable
+// cross-user read/write, either (a) use service_role via /api/admin.js
+// serverless function, or (b) disable RLS on a dev branch. Instructions
+// for both are in the README.
+
+let adminState = {
+  submissions: [],
+  selected: null,
+  filter: 'all',
+  profiles: {}, // submission_id -> profile
+};
+
+// ============================================================
+// QUESTION MAP (must mirror index.html)
+// ============================================================
+const Q_MAP = {
+  owner_name: "Your name",
+  business_name: "Business name",
+  one_liner: "In one sentence",
+  intro: "Introduce yourself and your business",
+  inspiration: "What inspired you to start",
+  purpose: "What the business is really about",
+  hopes: "What you hope family takes away",
+  support: "How family can best support you",
+  routine: "A part of your daily routine",
+  challenge: "A challenge you've overcome",
+  win: "A small win you're proud of",
+  lesson: "A lesson you wish you'd known earlier",
+  principle: "A principle that's helped you succeed",
+  advice: "Advice to the next generation",
+  open_to: "Open to mentorship or internships?",
+};
+
+// ============================================================
+// GATE
+// ============================================================
+document.getElementById('enterBtn').onclick = tryEnter;
+document.getElementById('pwd').addEventListener('keypress', e => { if (e.key === 'Enter') tryEnter(); });
+
+async function tryEnter() {
+  const pwd = document.getElementById('pwd').value;
+  const err = document.getElementById('gateErr');
+
+  // The password is checked against a hash stored in localStorage-set config,
+  // OR via a small Vercel serverless function (/api/admin-auth) if configured.
+  // For simplicity, we use a client-side check. Replace STORED_HASH below
+  // with the SHA-256 of your chosen password.
+  const STORED_HASH = window.APP_CONFIG.ADMIN_PASSWORD_SHA256 || "";
+
+  if (!STORED_HASH) {
+    // First-run fallback: any non-empty password works. See README for setting the hash.
+    if (pwd.length > 0) {
+      sessionStorage.setItem('admin_ok', '1');
+      boot();
+      return;
+    }
+  } else {
+    const hash = await sha256(pwd);
+    if (hash === STORED_HASH) {
+      sessionStorage.setItem('admin_ok', '1');
+      boot();
+      return;
+    }
+  }
+  err.textContent = "Incorrect password.";
+  err.style.display = 'block';
+}
+
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function boot() {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  loadSubmissions();
+}
+
+// Auto-boot if already authenticated this session
+if (sessionStorage.getItem('admin_ok') === '1') boot();
+
+// ============================================================
+// LOAD SUBMISSIONS
+// ============================================================
+async function loadSubmissions() {
+  const { data, error } = await sb
+    .from('submissions')
+    .select('*')
+    .order('updated_at', { ascending: false });
+
+  if (error) {
+    document.getElementById('submissionList').innerHTML =
+      `<div style="color:var(--accent);font-size:13px;padding:16px 0;">
+        Error loading: ${error.message}<br/><br/>
+        <strong>Note:</strong> RLS may be blocking access.
+        See README for admin data access options.
+      </div>`;
+    return;
+  }
+
+  adminState.submissions = data || [];
+
+  // also fetch profiles
+  const { data: profs } = await sb.from('profiles').select('*');
+  (profs || []).forEach(p => { adminState.profiles[p.submission_id] = p; });
+
+  renderList();
+}
+
+function renderList() {
+  const list = document.getElementById('submissionList');
+  const filtered = adminState.submissions.filter(s =>
+    adminState.filter === 'all' ? true : s.status === adminState.filter
+  );
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="padding:16px 0;color:var(--ink-mute);font-size:13px;text-align:center;">No submissions yet.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(s => `
+    <div class="sub-card ${adminState.selected?.id === s.id ? 'active' : ''}" onclick="selectSubmission('${s.id}')">
+      <div class="name">${escapeHtml(s.business_name || 'Untitled business')}</div>
+      <div class="owner">${escapeHtml(s.owner_name || '—')} &middot; ${escapeHtml(s.email)}</div>
+      <div class="meta-row">
+        <span class="badge ${s.status}">${s.status}</span>
+        <span class="time">${timeAgo(s.updated_at)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.querySelectorAll('.filter-tabs button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('.filter-tabs button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    adminState.filter = b.dataset.filter;
+    renderList();
+  };
+});
+
+window.selectSubmission = (id) => {
+  adminState.selected = adminState.submissions.find(s => s.id === id);
+  renderList();
+  renderDetail();
+};
+
+// ============================================================
+// DETAIL VIEW
+// ============================================================
+function renderDetail() {
+  const s = adminState.selected;
+  if (!s) return;
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('detail').style.display = 'block';
+
+  document.getElementById('dBusiness').textContent = s.business_name || 'Untitled business';
+  document.getElementById('dOwner').textContent = `${s.owner_name || '—'} · ${s.email}`;
+
+  const hasProfile = !!adminState.profiles[s.id];
+  document.getElementById('dActions').innerHTML = `
+    <button class="btn" onclick="generateProfile()" id="genBtn">
+      ${hasProfile ? 'Regenerate draft' : 'Generate profile draft'}
+    </button>
+    ${hasProfile ? '<button class="btn btn-primary" onclick="exportProfile()">Export HTML</button>' : ''}
+    ${hasProfile && !adminState.profiles[s.id].published
+      ? '<button class="btn btn-accent" onclick="publishProfile()">Publish</button>'
+      : ''}
+  `;
+
+  renderAnswersTab();
+  renderProfileTab();
+  renderPreviewTab();
+}
+
+document.querySelectorAll('.tabs button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'preview') renderPreviewTab();
+  };
+});
+
+function renderAnswersTab() {
+  const s = adminState.selected;
+  const a = s.answers || {};
+  const photos = s.photos || [];
+
+  let html = '';
+  Object.keys(Q_MAP).forEach(key => {
+    if (a[key]) {
+      html += `
+        <div class="qa-block">
+          <div class="q">${Q_MAP[key]}</div>
+          <div class="a">${escapeHtml(a[key])}</div>
+        </div>
+      `;
+    }
+  });
+
+  if (a.contact && (a.contact.email || a.contact.website || a.contact.instagram || a.contact.other)) {
+    html += `<div class="qa-block">
+      <div class="q">Contact</div>
+      <div class="a">${[
+        a.contact.email && 'Email: ' + a.contact.email,
+        a.contact.website && 'Web: ' + a.contact.website,
+        a.contact.instagram && 'IG: ' + a.contact.instagram,
+        a.contact.other && a.contact.other,
+      ].filter(Boolean).join('\n')}</div>
+    </div>`;
+  }
+
+  if (photos.length > 0) {
+    html += `<div class="qa-block"><div class="q">Photos</div><div class="photos-grid">
+      ${photos.map(p => `<img src="${p.url}" alt="">`).join('')}
+    </div></div>`;
+  }
+
+  document.getElementById('tab-answers').innerHTML = html || '<p style="color:var(--ink-mute);">No answers yet.</p>';
+}
+
+function renderProfileTab() {
+  const s = adminState.selected;
+  const prof = adminState.profiles[s.id];
+  const container = document.getElementById('tab-profile');
+
+  if (!prof) {
+    container.innerHTML = `
+      <p style="color: var(--ink-mute); font-family:'Fraunces',serif; font-size:17px; font-style:italic; padding: 40px 0;">
+        No profile draft yet. Click <strong>Generate profile draft</strong> above to have AI write a polished version from these answers.
+      </p>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="editor-field">
+      <label>Business name</label>
+      <input type="text" id="e_business_name" value="${escapeHtml(prof.business_name || '')}" />
+    </div>
+    <div class="editor-field">
+      <label>Owner name</label>
+      <input type="text" id="e_owner_name" value="${escapeHtml(prof.owner_name || '')}" />
+    </div>
+    <div class="editor-field">
+      <label>Tagline (one sentence)</label>
+      <input type="text" id="e_tagline" value="${escapeHtml(prof.tagline || '')}" />
+    </div>
+    <div class="editor-field">
+      <label>Hero image URL</label>
+      <input type="text" id="e_hero_image" value="${escapeHtml(prof.hero_image || '')}" />
+    </div>
+
+    <h3 class="display" style="font-weight:400;font-size:22px;margin:28px 0 14px;">Sections</h3>
+    <div id="sectionsEditor"></div>
+    <button class="add-btn" onclick="addSection()">+ Add section</button>
+
+    <h3 class="display" style="font-weight:400;font-size:22px;margin:28px 0 14px;">Contact</h3>
+    <div class="editor-field">
+      <label>Email</label>
+      <input type="text" id="e_contact_email" value="${escapeHtml(prof.contact?.email || '')}" />
+    </div>
+    <div class="editor-field">
+      <label>Website</label>
+      <input type="text" id="e_contact_website" value="${escapeHtml(prof.contact?.website || '')}" />
+    </div>
+    <div class="editor-field">
+      <label>Instagram</label>
+      <input type="text" id="e_contact_instagram" value="${escapeHtml(prof.contact?.instagram || '')}" />
+    </div>
+    <div class="editor-field">
+      <label>Other</label>
+      <input type="text" id="e_contact_other" value="${escapeHtml(prof.contact?.other || '')}" />
+    </div>
+
+    <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(31,27,22,0.15); display:flex; gap:10px;">
+      <button class="btn btn-primary" onclick="saveProfile()">Save changes</button>
+      <button class="btn" onclick="renderPreviewTab(); document.querySelector('[data-tab=preview]').click()">See preview</button>
+    </div>
+  `;
+
+  renderSectionsEditor();
+}
+
+function renderSectionsEditor() {
+  const s = adminState.selected;
+  const prof = adminState.profiles[s.id];
+  const wrap = document.getElementById('sectionsEditor');
+  const sections = prof.sections || [];
+
+  wrap.innerHTML = sections.map((sec, i) => `
+    <div class="section-editor">
+      <button class="rm-section" onclick="removeSection(${i})" title="Remove">&times;</button>
+      <div class="editor-field">
+        <label>Heading</label>
+        <input type="text" data-section-heading="${i}" value="${escapeHtml(sec.heading || '')}" />
+      </div>
+      <div class="editor-field">
+        <label>Body</label>
+        <textarea data-section-body="${i}" rows="5">${escapeHtml(sec.body || '')}</textarea>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.addSection = () => {
+  const s = adminState.selected;
+  const prof = adminState.profiles[s.id];
+  syncSectionsFromUI(prof);
+  prof.sections.push({ heading: 'New section', body: '' });
+  renderSectionsEditor();
+};
+
+window.removeSection = (i) => {
+  const s = adminState.selected;
+  const prof = adminState.profiles[s.id];
+  syncSectionsFromUI(prof);
+  prof.sections.splice(i, 1);
+  renderSectionsEditor();
+};
+
+function syncSectionsFromUI(prof) {
+  const count = document.querySelectorAll('[data-section-heading]').length;
+  const sections = [];
+  for (let i = 0; i < count; i++) {
+    const h = document.querySelector(`[data-section-heading="${i}"]`);
+    const b = document.querySelector(`[data-section-body="${i}"]`);
+    if (h && b) sections.push({ heading: h.value, body: b.value });
+  }
+  prof.sections = sections;
+}
+
+window.saveProfile = async () => {
+  const s = adminState.selected;
+  const prof = adminState.profiles[s.id];
+  syncSectionsFromUI(prof);
+
+  prof.business_name = document.getElementById('e_business_name').value;
+  prof.owner_name = document.getElementById('e_owner_name').value;
+  prof.tagline = document.getElementById('e_tagline').value;
+  prof.hero_image = document.getElementById('e_hero_image').value;
+  prof.contact = {
+    email: document.getElementById('e_contact_email').value,
+    website: document.getElementById('e_contact_website').value,
+    instagram: document.getElementById('e_contact_instagram').value,
+    other: document.getElementById('e_contact_other').value,
+  };
+
+  const { error } = await sb.from('profiles').update({
+    business_name: prof.business_name,
+    owner_name: prof.owner_name,
+    tagline: prof.tagline,
+    hero_image: prof.hero_image,
+    sections: prof.sections,
+    contact: prof.contact,
+  }).eq('id', prof.id);
+
+  if (error) toast('Save failed: ' + error.message);
+  else toast('Saved');
+};
+
+// ============================================================
+// GENERATE PROFILE (AI)
+// ============================================================
+window.generateProfile = async () => {
+  const s = adminState.selected;
+  const btn = document.getElementById('genBtn');
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
+  btn.disabled = true;
+
+  try {
+    // Call Vercel serverless function
+    const resp = await fetch('/api/generate-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        answers: s.answers,
+        business_name: s.business_name,
+        owner_name: s.owner_name,
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      throw new Error('API error: ' + err);
+    }
+    const draft = await resp.json();
+
+    // Upsert profile
+    const existing = adminState.profiles[s.id];
+    const payload = {
+      submission_id: s.id,
+      business_name: draft.business_name || s.business_name,
+      owner_name: draft.owner_name || s.owner_name,
+      tagline: draft.tagline,
+      hero_image: (s.photos && s.photos[0] && s.photos[0].url) || '',
+      sections: draft.sections || [],
+      gallery: (s.photos || []).map(p => ({ url: p.url, caption: p.caption || '' })),
+      contact: s.answers?.contact || {},
+    };
+
+    let result;
+    if (existing) {
+      result = await sb.from('profiles').update(payload).eq('id', existing.id).select().single();
+    } else {
+      result = await sb.from('profiles').insert(payload).select().single();
+    }
+    if (result.error) throw result.error;
+
+    adminState.profiles[s.id] = result.data;
+    toast('Profile draft generated');
+    renderDetail();
+  } catch (e) {
+    console.error(e);
+    toast('Generation failed: ' + e.message);
+    btn.innerHTML = 'Generate profile draft';
+    btn.disabled = false;
+  }
+};
+
+// ============================================================
+// PUBLISH
+// ============================================================
+window.publishProfile = async () => {
+  const s = adminState.selected;
+  const prof = adminState.profiles[s.id];
+  const { error } = await sb.from('profiles').update({ published: true }).eq('id', prof.id);
+  if (error) { toast('Publish failed'); return; }
+  prof.published = true;
+  await sb.from('submissions').update({ status: 'published' }).eq('id', s.id);
+  s.status = 'published';
+  renderList();
+  renderDetail();
+  toast('Published');
+};
+
+// ============================================================
+// EXPORT
+// ============================================================
+window.exportProfile = () => {
+  const s = adminState.selected;
+  const prof = adminState.profiles[s.id];
+  const html = buildProfileHTML(prof);
+  document.getElementById('exportPre').textContent = html;
+  document.getElementById('exportModal').classList.add('active');
+};
+
+document.getElementById('closeExport').onclick = () => {
+  document.getElementById('exportModal').classList.remove('active');
+};
+document.getElementById('copyHtml').onclick = () => {
+  navigator.clipboard.writeText(document.getElementById('exportPre').textContent);
+  toast('Copied to clipboard');
+};
+document.getElementById('downloadHtml').onclick = () => {
+  const s = adminState.selected;
+  const prof = adminState.profiles[s.id];
+  const html = document.getElementById('exportPre').textContent;
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (prof.business_name || 'profile').toLowerCase().replace(/\s+/g, '-') + '.html';
+  a.click();
+};
+
+// ============================================================
+// PREVIEW
+// ============================================================
+function renderPreviewTab() {
+  const s = adminState.selected;
+  if (!s) return;
+  const prof = adminState.profiles[s.id];
+  const container = document.getElementById('tab-preview');
+
+  if (!prof) {
+    container.innerHTML = '<p style="color:var(--ink-mute);font-style:italic;padding:40px 0;">Generate a profile draft first to see a preview.</p>';
+    return;
+  }
+
+  const html = buildProfileHTML(prof);
+  container.innerHTML = `<iframe class="preview-frame" srcdoc="${escapeAttr(html)}"></iframe>`;
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]);
+}
+function escapeAttr(s) {
+  return String(s || '').replace(/"/g, '&quot;');
+}
+
+function timeAgo(iso) {
+  const d = new Date(iso);
+  const s = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+// ============================================================
+// PROFILE HTML BUILDER (must match profile.html template)
+// ============================================================
+function buildProfileHTML(p) {
+  const sections = (p.sections || []).map(s => `
+      <section class="block">
+        <h2>${escapeHtml(s.heading)}</h2>
+        <div class="body">${escapeHtml(s.body).replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>').replace(/^/, '<p>').replace(/$/, '</p>')}</div>
+      </section>
+  `).join('');
+
+  const gallery = (p.gallery || []).length > 0 ? `
+    <section class="gallery">
+      ${p.gallery.map(g => `<figure><img src="${escapeHtml(g.url)}" alt="${escapeHtml(g.caption||'')}"/>${g.caption ? `<figcaption>${escapeHtml(g.caption)}</figcaption>` : ''}</figure>`).join('')}
+    </section>
+  ` : '';
+
+  const c = p.contact || {};
+  const contactLinks = [
+    c.email && `<a href="mailto:${escapeHtml(c.email)}">${escapeHtml(c.email)}</a>`,
+    c.website && `<a href="${escapeHtml(c.website)}" target="_blank" rel="noopener">${escapeHtml(c.website.replace(/^https?:\/\//,''))}</a>`,
+    c.instagram && `<a href="https://instagram.com/${escapeHtml(c.instagram.replace('@',''))}" target="_blank" rel="noopener">${escapeHtml(c.instagram)}</a>`,
+    c.other && `<span>${escapeHtml(c.other)}</span>`,
+  ].filter(Boolean).join(' &middot; ');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(p.business_name)} &mdash; Family Spotlight</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#f4ede2; --ink:#1f1b16; --ink-soft:#4a4238; --ink-mute:#7a6f61; --accent:#b8453a; --gold:#c89434; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);line-height:1.6}
+  .profile-root{max-width:820px;margin:0 auto;padding:clamp(48px,8vh,96px) clamp(24px,5vw,56px)}
+  .eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:14px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--accent)}
+  .profile-root h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(40px,7vw,76px);line-height:.98;letter-spacing:-.03em;margin-bottom:20px}
+  .profile-root h1 em{font-style:italic;color:var(--accent);font-weight:400}
+  .tagline{font-family:'Fraunces',serif;font-weight:300;font-style:italic;font-size:clamp(18px,2.2vw,24px);color:var(--ink-soft);margin-bottom:40px;max-width:640px;line-height:1.45}
+  .owner-row{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:56px;padding-bottom:32px;border-bottom:1px solid var(--ink)}
+  .hero-image{margin-bottom:56px}
+  .hero-image img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;display:block}
+  .block{margin-bottom:56px}
+  .block h2{font-family:'Fraunces',serif;font-weight:400;font-size:clamp(24px,3.5vw,36px);letter-spacing:-.01em;margin-bottom:16px;line-height:1.2}
+  .block .body{font-family:'Fraunces',serif;font-weight:300;font-size:18px;line-height:1.7;color:var(--ink-soft)}
+  .block .body p{margin-bottom:16px}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:56px 0}
+  .gallery figure{margin:0}
+  .gallery img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+  .gallery figcaption{font-size:12px;color:var(--ink-mute);margin-top:6px;font-style:italic}
+  .contact{margin-top:56px;padding-top:32px;border-top:1px solid var(--ink);display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:14px}
+  .contact .label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute);margin-right:8px}
+  .contact a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink)}
+  .contact a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+</style>
+</head>
+<body>
+<article class="profile-root">
+  <div class="eyebrow">Family Entrepreneur Spotlight</div>
+  <h1>${escapeHtml(p.business_name)}</h1>
+  ${p.tagline ? `<p class="tagline">${escapeHtml(p.tagline)}</p>` : ''}
+  <div class="owner-row">Founded &amp; led by ${escapeHtml(p.owner_name || '')}</div>
+  ${p.hero_image ? `<div class="hero-image"><img src="${escapeHtml(p.hero_image)}" alt=""/></div>` : ''}
+  ${sections}
+  ${gallery}
+  ${contactLinks ? `<div class="contact"><span class="label">Get in touch</span>${contactLinks}</div>` : ''}
+</article>
+</body>
+</html>`;
+}
+</script>
+</body>
+</html>
