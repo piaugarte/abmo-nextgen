@@ -41,8 +41,11 @@
   aside .sub { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 24px; }
 
   .filter-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 16px; }
-  .filter-tabs button { flex: 1 1 auto; padding: 6px 10px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; background: transparent; border: 1px solid rgba(31,27,22,0.2); cursor: pointer; font-family: inherit; color: var(--ink-soft); border-radius: 999px; white-space: nowrap; }
+  .filter-tabs button { flex: 1 1 auto; padding: 6px 10px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; background: transparent; border: 1px solid rgba(31,27,22,0.2); cursor: pointer; font-family: inherit; color: var(--ink-soft); border-radius: 999px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
   .filter-tabs button.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .filter-tabs .count { font-size: 9px; background: rgba(31,27,22,0.08); color: var(--ink-mute); padding: 1px 6px; border-radius: 999px; letter-spacing: 0; font-weight: 500; min-width: 16px; text-align: center; }
+  .filter-tabs .count:empty { display: none; }
+  .filter-tabs button.active .count { background: rgba(244,237,226,0.2); color: var(--paper); }
 
   .submission-list { display: flex; flex-direction: column; gap: 8px; }
   .sub-card { padding: 14px 16px; background: var(--paper); border: 1px solid rgba(31,27,22,0.15); cursor: pointer; transition: all 0.15s; border-radius: 10px; }
@@ -170,12 +173,12 @@
     <div class="sub">Family Entrepreneur Spotlight</div>
 
     <div class="filter-tabs">
-      <button class="active" data-filter="all">All</button>
-      <button data-filter="new">New</button>
-      <button data-filter="cleaned">Cleaned</button>
-      <button data-filter="for_approval">For approval</button>
-      <button data-filter="approved">Approved</button>
-      <button data-filter="live">Live</button>
+      <button class="active" data-filter="all">All <span class="count" data-count="all"></span></button>
+      <button data-filter="new">New <span class="count" data-count="new"></span></button>
+      <button data-filter="cleaned">Cleaned <span class="count" data-count="cleaned"></span></button>
+      <button data-filter="for_approval">For approval <span class="count" data-count="for_approval"></span></button>
+      <button data-filter="approved">Approved <span class="count" data-count="approved"></span></button>
+      <button data-filter="live">Live <span class="count" data-count="live"></span></button>
     </div>
 
     <div class="submission-list" id="submissionList">
@@ -367,7 +370,22 @@ function stateLabel(state) {
   })[state] || state;
 }
 
+function renderFilterCounts() {
+  // Tally how many submissions fall into each state
+  const counts = { all: adminState.submissions.length, new: 0, cleaned: 0, for_approval: 0, approved: 0, live: 0 };
+  adminState.submissions.forEach(s => {
+    const st = submissionState(s);
+    if (counts[st] !== undefined) counts[st]++;
+  });
+  // Write each count into its pill; blank out zeros so they hide via :empty CSS
+  Object.keys(counts).forEach(key => {
+    const el = document.querySelector(`.filter-tabs .count[data-count="${key}"]`);
+    if (el) el.textContent = counts[key] > 0 ? counts[key] : '';
+  });
+}
+
 function renderList() {
+  renderFilterCounts();
   const list = document.getElementById('submissionList');
   const filtered = adminState.submissions.filter(s => {
     if (adminState.filter === 'all') return true;
