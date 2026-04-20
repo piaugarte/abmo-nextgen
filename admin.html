@@ -40,8 +40,8 @@
   aside .title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 4px; }
   aside .sub { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 24px; }
 
-  .filter-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
-  .filter-tabs button { flex: 1; padding: 8px 10px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; background: transparent; border: 1px solid rgba(31,27,22,0.2); cursor: pointer; font-family: inherit; color: var(--ink-soft); border-radius: 999px; }
+  .filter-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 16px; }
+  .filter-tabs button { flex: 1 1 auto; padding: 6px 10px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; background: transparent; border: 1px solid rgba(31,27,22,0.2); cursor: pointer; font-family: inherit; color: var(--ink-soft); border-radius: 999px; white-space: nowrap; }
   .filter-tabs button.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
   .submission-list { display: flex; flex-direction: column; gap: 8px; }
@@ -51,10 +51,12 @@
   .sub-card .name { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; margin-bottom: 2px; }
   .sub-card .owner { font-size: 12px; color: var(--ink-mute); margin-bottom: 8px; }
   .sub-card .meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-  .badge { padding: 2px 10px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; border-radius: 999px; }
+  .badge { padding: 2px 10px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; border-radius: 999px; white-space: nowrap; }
   .badge.new { background: rgba(200,148,52,0.2); color: var(--gold); }
   .badge.cleaned { background: rgba(122,111,97,0.2); color: var(--ink-soft); }
-  .badge.live { background: rgba(90,122,62,0.2); color: var(--green); }
+  .badge.for_approval { background: rgba(184,69,58,0.15); color: var(--accent); }
+  .badge.approved { background: rgba(90,122,62,0.15); color: var(--green); }
+  .badge.live { background: var(--green); color: var(--paper); }
   .sub-card .time { color: var(--ink-mute); }
 
   main.content { padding: 32px 40px; max-height: 100vh; overflow-y: auto; }
@@ -101,6 +103,8 @@
   .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
   .btn-accent { background: var(--accent); color: var(--paper); border-color: var(--accent); }
   .btn-accent:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+  .btn-danger { border-color: rgba(143,45,36,0.4); color: var(--accent-deep); }
+  .btn-danger:hover { background: var(--accent-deep); color: var(--paper); border-color: var(--accent-deep); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .actions-bar { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -169,6 +173,8 @@
       <button class="active" data-filter="all">All</button>
       <button data-filter="new">New</button>
       <button data-filter="cleaned">Cleaned</button>
+      <button data-filter="for_approval">For approval</button>
+      <button data-filter="approved">Approved</button>
       <button data-filter="live">Live</button>
     </div>
 
@@ -336,14 +342,29 @@ function hydrateProfile(rawProf) {
 }
 
 // Derive the display state of a submission from its data:
-//   'live'    = a profile exists AND it's been marked published
-//   'cleaned' = a profile exists (cleanup has been run)
-//   'new'     = no profile yet (never cleaned up)
+//   'new'           = no profile yet (never cleaned up)
+//   'cleaned'       = profile exists, stage = 'cleaned' (default after AI cleanup)
+//   'for_approval'  = profile exists, stage = 'for_approval'
+//   'approved'      = profile exists, stage = 'approved'
+//   'live'          = profile exists, stage = 'live' (also back-compat: published=true)
 function submissionState(s) {
   const prof = adminState.profiles[s.id];
   if (!prof) return 'new';
+  if (prof.stage) return prof.stage;
+  // Back-compat for rows without stage set: infer from published flag
   if (prof.published) return 'live';
   return 'cleaned';
+}
+
+// Human-readable label for a state
+function stateLabel(state) {
+  return ({
+    new: 'New',
+    cleaned: 'Cleaned',
+    for_approval: 'For approval',
+    approved: 'Approved',
+    live: 'Live',
+  })[state] || state;
 }
 
 function renderList() {
@@ -363,7 +384,7 @@ function renderList() {
       <div class="name">${escapeHtml(s.business_name || 'Untitled business')}</div>
       <div class="owner">${escapeHtml(s.owner_name || '—')} &middot; ${escapeHtml(s.email)}</div>
       <div class="meta-row">
-        <span class="badge ${state}">${state}</span>
+        <span class="badge ${state}">${stateLabel(state)}</span>
         <span class="time">${timeAgo(s.updated_at)}</span>
       </div>
     </div>`;
@@ -386,8 +407,17 @@ window.selectSubmission = (id) => {
 };
 
 // ============================================================
-// DETAIL
+// STAGE FLOW
+// Forward progression: cleaned → for_approval → approved → live
+// Each stage has a label for the "next stage" button and the "back" button.
 // ============================================================
+const STAGE_FLOW = {
+  cleaned:      { nextStage: 'for_approval', nextLabel: 'Mark for approval',     prevStage: null,           prevLabel: null },
+  for_approval: { nextStage: 'approved',     nextLabel: 'Mark as approved',     prevStage: 'cleaned',      prevLabel: 'Back to Cleaned' },
+  approved:     { nextStage: 'live',         nextLabel: 'Mark as live',         prevStage: 'for_approval', prevLabel: 'Back to For Approval' },
+  live:         { nextStage: null,           nextLabel: null,                   prevStage: 'approved',     prevLabel: 'Unmark live' },
+};
+
 function renderDetail() {
   const s = adminState.selected;
   if (!s) return;
@@ -398,17 +428,30 @@ function renderDetail() {
 
   const prof = adminState.profiles[s.id];
   const hasProfile = !!prof;
-  const isLive = hasProfile && prof.published;
-  document.getElementById('dActions').innerHTML = `
+  const currentState = submissionState(s);
+  const flow = hasProfile ? STAGE_FLOW[currentState] : null;
+
+  // Build the actions bar: status badge + cleanup button + stage buttons
+  let actionsHtml = `
+    <span class="badge ${currentState}" style="align-self: center; margin-right: 4px;">${stateLabel(currentState)}</span>
     <button class="btn" onclick="cleanUpAnswers()" id="cleanBtn">
       ${hasProfile ? 'Re-run cleanup' : 'Clean up answers'}
     </button>
-    ${hasProfile
-      ? (isLive
-          ? '<button class="btn" onclick="toggleLive(false)">Unmark live</button>'
-          : '<button class="btn btn-accent" onclick="toggleLive(true)">Mark as live</button>')
-      : ''}
   `;
+
+  if (flow) {
+    if (flow.prevStage || currentState === 'live') {
+      actionsHtml += `<button class="btn" onclick="setStage('${flow.prevStage}')">${flow.prevLabel}</button>`;
+    }
+    if (flow.nextStage) {
+      actionsHtml += `<button class="btn btn-accent" onclick="setStage('${flow.nextStage}')">${flow.nextLabel} &rarr;</button>`;
+    }
+  }
+
+  // Delete — always available, styled quietly so it doesn't compete
+  actionsHtml += `<button class="btn btn-danger" onclick="deleteSubmission()" title="Delete this entry and all its data">Delete</button>`;
+
+  document.getElementById('dActions').innerHTML = actionsHtml;
   renderAnswersTab();
   renderProfileTab();
 }
@@ -637,6 +680,9 @@ window.cleanUpAnswers = async () => {
       gallery: (s.photos || []).map(p => ({ url: p.url, caption: p.caption || '' })),
       contact: (s.answers && s.answers.contact) || {},
     };
+    // Only set stage when creating a fresh profile. Re-running cleanup
+    // on an existing profile keeps whatever stage it was already at.
+    if (!existing) payload.stage = 'cleaned';
 
     let result;
     if (existing) {
@@ -660,21 +706,71 @@ window.cleanUpAnswers = async () => {
 };
 
 // ============================================================
-// MARK AS LIVE / UNMARK
-// Toggles the `published` flag on the profile. Content stays editable.
+// SET STAGE
+// Advances (or rewinds) the profile stage. Content stays editable at every stage.
+// Also syncs `published` for back-compat (true when stage === 'live').
 // ============================================================
-window.toggleLive = async (makeLive) => {
+window.setStage = async (newStage) => {
   const s = adminState.selected;
   const prof = adminState.profiles[s.id];
-  const { error } = await sb.from('profiles').update({ published: makeLive }).eq('id', prof.id);
+  if (!prof || !newStage) return;
+
+  const payload = {
+    stage: newStage,
+    published: newStage === 'live',
+  };
+
+  const { error } = await sb.from('profiles').update(payload).eq('id', prof.id);
   if (error) { toast('Update failed: ' + error.message); return; }
-  prof.published = makeLive;
-  // Keep submissions.status roughly in sync for back-compat
-  await sb.from('submissions').update({ status: makeLive ? 'published' : 'draft' }).eq('id', s.id);
-  s.status = makeLive ? 'published' : 'draft';
+
+  prof.stage = newStage;
+  prof.published = payload.published;
+
+  // Keep submissions.status loosely in sync
+  const submissionStatus = newStage === 'live' ? 'published' : 'draft';
+  await sb.from('submissions').update({ status: submissionStatus }).eq('id', s.id);
+  s.status = submissionStatus;
+
   renderList();
   renderDetail();
-  toast(makeLive ? 'Marked as live' : 'Unmarked live');
+  toast('Moved to ' + stateLabel(newStage));
+};
+
+// ============================================================
+// DELETE SUBMISSION
+// Deletes the submission AND any associated profile row.
+// One confirmation step — names what's being deleted to prevent mistakes.
+// Storage photos are not deleted automatically (orphaned files don't hurt;
+// cleaning storage can be done manually in Supabase if needed).
+// ============================================================
+window.deleteSubmission = async () => {
+  const s = adminState.selected;
+  if (!s) return;
+
+  const label = s.business_name || s.owner_name || s.email;
+  const ok = confirm(`Delete "${label}"?\n\nThis removes the submission and any cleaned-up profile permanently. Cannot be undone.`);
+  if (!ok) return;
+
+  // Delete profile row first (if exists), then the submission
+  const prof = adminState.profiles[s.id];
+  if (prof) {
+    const r = await sb.from('profiles').delete().eq('id', prof.id);
+    if (r.error) { toast('Delete failed (profile): ' + r.error.message); return; }
+  }
+  const r2 = await sb.from('submissions').delete().eq('id', s.id);
+  if (r2.error) { toast('Delete failed (submission): ' + r2.error.message); return; }
+
+  // Remove from local state
+  adminState.submissions = adminState.submissions.filter(x => x.id !== s.id);
+  delete adminState.profiles[s.id];
+  adminState.selected = null;
+
+  // Go back to empty state
+  document.getElementById('detail').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'flex';
+
+  renderList();
+  toast('Deleted "' + label + '"');
 };
 
 // ============================================================
