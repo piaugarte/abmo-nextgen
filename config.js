@@ -15,4 +15,10 @@ window.APP_CONFIG = {
   // The actual protection is on the serverless function (see /api/admin.js)
   // which uses the ADMIN_PASSWORD env var set in Vercel.
   ADMIN_PASSWORD_HINT: "Ask Pia for the password",
+
+  // SHA-256 hash of the admin password. Set to empty string ("") to disable
+  // the gate (any password will work). To change the password, generate a
+  // new SHA-256 hash and paste it here.
+  // Current password: ChetAboitiz2026!
+  ADMIN_PASSWORD_SHA256: "0b5afdcc3738a9781a3bbc6bddf3497548b01984890dccf4819c1fbc065b3a38",
 };
