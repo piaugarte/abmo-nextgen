@@ -40,6 +40,32 @@
   aside .title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 4px; }
   aside .sub { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 24px; }
 
+  /* Top-level mode switcher (Submissions / Nominations) */
+  .mode-switch { display: flex; gap: 4px; margin-bottom: 20px; padding: 4px; background: rgba(31,27,22,0.06); border-radius: 12px; }
+  .mode-switch button { flex: 1; padding: 8px 12px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; background: transparent; border: none; cursor: pointer; font-family: inherit; color: var(--ink-mute); border-radius: 8px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .mode-switch button.active { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .mode-switch .count { font-size: 10px; background: rgba(31,27,22,0.1); color: var(--ink-mute); padding: 1px 6px; border-radius: 999px; font-weight: 500; min-width: 16px; text-align: center; }
+  .mode-switch .count:empty { display: none; }
+  .mode-switch button.active .count { background: var(--ink); color: var(--paper); }
+
+  /* Nomination cards in the sidebar list */
+  .nom-card { padding: 14px 16px; background: var(--paper); border: 1px solid rgba(31,27,22,0.15); cursor: default; border-radius: 10px; }
+  .nom-card .nom-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .nom-card .nom-name { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 500; line-height: 1.3; }
+  .nom-card .nom-business { font-size: 12px; color: var(--ink-mute); margin-bottom: 8px; font-style: italic; }
+  .nom-card .nom-email { font-size: 12px; color: var(--ink-soft); margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; word-break: break-all; }
+  .nom-card .nom-from { font-size: 11px; color: var(--ink-mute); margin-bottom: 12px; }
+  .nom-card .nom-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .nom-card .nom-btn { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; border: 1px solid rgba(31,27,22,0.2); background: transparent; cursor: pointer; font-family: inherit; border-radius: 999px; color: var(--ink-soft); }
+  .nom-card .nom-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .nom-card .nom-btn.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .nom-card .nom-btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+  .nom-card .nom-btn.danger { color: var(--accent-deep); border-color: rgba(143,45,36,0.3); }
+  .nom-card .nom-btn.danger:hover { background: var(--accent-deep); color: var(--paper); border-color: var(--accent-deep); }
+
+  /* Bigger nominations grid in main content area */
+  .nominations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+
   .filter-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 16px; }
   .filter-tabs button { flex: 1 1 auto; padding: 6px 10px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; background: transparent; border: 1px solid rgba(31,27,22,0.2); cursor: pointer; font-family: inherit; color: var(--ink-soft); border-radius: 999px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
   .filter-tabs button.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
@@ -169,26 +195,53 @@
 
 <div class="app" id="app">
   <aside>
-    <div class="title">Submissions</div>
-    <div class="sub">Family Entrepreneur Spotlight</div>
-
-    <div class="filter-tabs">
-      <button class="active" data-filter="all">All <span class="count" data-count="all"></span></button>
-      <button data-filter="new">New <span class="count" data-count="new"></span></button>
-      <button data-filter="cleaned">Cleaned <span class="count" data-count="cleaned"></span></button>
-      <button data-filter="for_approval">For approval <span class="count" data-count="for_approval"></span></button>
-      <button data-filter="approved">Approved <span class="count" data-count="approved"></span></button>
-      <button data-filter="live">Live <span class="count" data-count="live"></span></button>
+    <div class="mode-switch">
+      <button class="active" data-mode="submissions">Submissions <span class="count" id="submissionsCount"></span></button>
+      <button data-mode="nominations">Nominations <span class="count" id="nominationsCount"></span></button>
     </div>
 
-    <div class="submission-list" id="submissionList">
-      <div style="padding: 20px 0; color: var(--ink-mute); font-size: 13px; text-align: center;">Loading...</div>
+    <div id="sidebarSubmissions">
+      <div class="title">Submissions</div>
+      <div class="sub">Family Entrepreneur Spotlight</div>
+
+      <div class="filter-tabs">
+        <button class="active" data-filter="all">All <span class="count" data-count="all"></span></button>
+        <button data-filter="new">New <span class="count" data-count="new"></span></button>
+        <button data-filter="cleaned">Cleaned <span class="count" data-count="cleaned"></span></button>
+        <button data-filter="for_approval">For approval <span class="count" data-count="for_approval"></span></button>
+        <button data-filter="approved">Approved <span class="count" data-count="approved"></span></button>
+        <button data-filter="live">Live <span class="count" data-count="live"></span></button>
+      </div>
+
+      <div class="submission-list" id="submissionList">
+        <div style="padding: 20px 0; color: var(--ink-mute); font-size: 13px; text-align: center;">Loading...</div>
+      </div>
+    </div>
+
+    <div id="sidebarNominations" style="display:none;">
+      <div class="title">Nominations</div>
+      <div class="sub">Suggested family entrepreneurs</div>
+
+      <div class="filter-tabs">
+        <button class="active" data-nom-filter="all">All <span class="count" data-nom-count="all"></span></button>
+        <button data-nom-filter="new">New <span class="count" data-nom-count="new"></span></button>
+        <button data-nom-filter="contacted">Contacted <span class="count" data-nom-count="contacted"></span></button>
+      </div>
     </div>
   </aside>
 
   <main class="content">
     <div class="empty-state" id="emptyState">
       <div class="inner">&ldquo;Select a submission from the left to review and edit.&rdquo;</div>
+    </div>
+
+    <!-- Nominations view (full-width grid of cards) -->
+    <div id="nominationsView" style="display:none;">
+      <div style="margin-bottom: 24px;">
+        <h1 style="font-family: 'Fraunces', serif; font-size: 32px; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 6px;">Nominations</h1>
+        <p style="color: var(--ink-mute); font-size: 14px;">Family members suggested by others to share their story.</p>
+      </div>
+      <div class="nominations-grid" id="nominationsGrid"></div>
     </div>
 
     <div class="detail" id="detail" style="display:none;">
@@ -217,7 +270,12 @@
 const cfg = window.APP_CONFIG;
 const sb = supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
-let adminState = { submissions: [], selected: null, filter: 'all', profiles: {} };
+let adminState = {
+  submissions: [], selected: null, filter: 'all', profiles: {},
+  // Nominations mode
+  mode: 'submissions',  // 'submissions' | 'nominations'
+  nominations: [], nomFilter: 'all',
+};
 
 // ============================================================
 // QUESTIONNAIRE STRUCTURE
@@ -305,6 +363,7 @@ function boot() {
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').classList.add('active');
   loadSubmissions();
+  loadNominations();
 }
 
 if (sessionStorage.getItem('admin_ok') === '1') boot();
@@ -325,6 +384,20 @@ async function loadSubmissions() {
   (profs || []).forEach(p => { adminState.profiles[p.submission_id] = hydrateProfile(p); });
 
   renderList();
+  renderTopCounts();
+}
+
+async function loadNominations() {
+  const { data, error } = await sb.from('nominations').select('*').order('created_at', { ascending: false });
+  if (error) {
+    // Table might not exist yet — silently fail and let the user run the SQL migration
+    console.warn('Could not load nominations (table may not exist yet):', error.message);
+    adminState.nominations = [];
+  } else {
+    adminState.nominations = data || [];
+  }
+  renderNominationsGrid();
+  renderTopCounts();
 }
 
 // Make sure a profile has a `cleaned` object (migrates old shapes away quietly)
@@ -386,6 +459,7 @@ function renderFilterCounts() {
 
 function renderList() {
   renderFilterCounts();
+  renderTopCounts();
   const list = document.getElementById('submissionList');
   const filtered = adminState.submissions.filter(s => {
     if (adminState.filter === 'all') return true;
@@ -409,14 +483,156 @@ function renderList() {
   }).join('');
 }
 
-document.querySelectorAll('.filter-tabs button').forEach(b => {
+// Scope filter handlers properly to avoid conflict with nominations filters
+document.querySelectorAll('#sidebarSubmissions .filter-tabs button').forEach(b => {
   b.onclick = () => {
-    document.querySelectorAll('.filter-tabs button').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('#sidebarSubmissions .filter-tabs button').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
     adminState.filter = b.dataset.filter;
     renderList();
   };
 });
+
+document.querySelectorAll('#sidebarNominations .filter-tabs button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('#sidebarNominations .filter-tabs button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    adminState.nomFilter = b.dataset.nomFilter;
+    renderNominationsGrid();
+  };
+});
+
+// ============================================================
+// MODE SWITCHER (Submissions / Nominations)
+// ============================================================
+document.querySelectorAll('.mode-switch button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('.mode-switch button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    adminState.mode = b.dataset.mode;
+    applyMode();
+  };
+});
+
+function applyMode() {
+  const isSubmissions = adminState.mode === 'submissions';
+  document.getElementById('sidebarSubmissions').style.display = isSubmissions ? 'block' : 'none';
+  document.getElementById('sidebarNominations').style.display = isSubmissions ? 'none' : 'block';
+
+  // Main content area
+  document.getElementById('nominationsView').style.display = isSubmissions ? 'none' : 'block';
+  if (isSubmissions) {
+    // Show whichever submission detail was active, or the empty state
+    if (adminState.selected) {
+      document.getElementById('detail').style.display = 'block';
+      document.getElementById('emptyState').style.display = 'none';
+    } else {
+      document.getElementById('detail').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'flex';
+    }
+  } else {
+    document.getElementById('detail').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'none';
+  }
+}
+
+function renderTopCounts() {
+  // Submissions count = total
+  const sCount = document.getElementById('submissionsCount');
+  sCount.textContent = adminState.submissions.length > 0 ? adminState.submissions.length : '';
+
+  // Nominations count = NEW ones only (the action-needed ones)
+  const newNoms = adminState.nominations.filter(n => (n.status || 'new') === 'new').length;
+  const nCount = document.getElementById('nominationsCount');
+  nCount.textContent = newNoms > 0 ? newNoms : '';
+}
+
+// ============================================================
+// NOMINATIONS LIST RENDERING
+// ============================================================
+function renderNominationsGrid() {
+  // Per-filter pill counts in the sidebar
+  const counts = { all: adminState.nominations.length, new: 0, contacted: 0 };
+  adminState.nominations.forEach(n => {
+    const st = n.status || 'new';
+    if (counts[st] !== undefined) counts[st]++;
+  });
+  Object.keys(counts).forEach(key => {
+    const el = document.querySelector(`[data-nom-count="${key}"]`);
+    if (el) el.textContent = counts[key] > 0 ? counts[key] : '';
+  });
+
+  const grid = document.getElementById('nominationsGrid');
+  const filtered = adminState.nominations.filter(n => {
+    if (adminState.nomFilter === 'all') return true;
+    return (n.status || 'new') === adminState.nomFilter;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="color:var(--ink-mute);font-size:14px;padding:20px 0;font-style:italic;">No nominations in this view yet.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(n => {
+    const status = n.status || 'new';
+    const fullName = `${n.nominee_first_name || ''} ${n.nominee_last_name || ''}`.trim();
+    const nominator = `${n.nominator_first_name || ''} ${n.nominator_last_name || ''}`.trim();
+    const isContacted = status === 'contacted';
+    return `
+      <div class="nom-card">
+        <div class="nom-header">
+          <div class="nom-name">${escapeHtml(fullName) || '—'}</div>
+          <span class="badge ${isContacted ? 'cleaned' : 'new'}">${isContacted ? 'Contacted' : 'New'}</span>
+        </div>
+        ${n.business_name ? `<div class="nom-business">${escapeHtml(n.business_name)}</div>` : ''}
+        <div class="nom-email">${escapeHtml(n.nominee_email || '')}</div>
+        <div class="nom-from">Nominated by <strong>${escapeHtml(nominator)}</strong> &middot; ${timeAgo(n.created_at)}</div>
+        <div class="nom-actions">
+          <button class="nom-btn ${isContacted ? '' : 'primary'}" onclick="toggleNominationStatus('${n.id}', ${isContacted ? "'new'" : "'contacted'"})">${isContacted ? 'Mark as new' : 'Mark contacted'}</button>
+          <button class="nom-btn" onclick="copyToClipboard('${escapeAttr(n.nominee_email)}', this)">Copy email</button>
+          <button class="nom-btn danger" onclick="deleteNomination('${n.id}')">Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+window.toggleNominationStatus = async (id, newStatus) => {
+  const { error } = await sb.from('nominations').update({ status: newStatus }).eq('id', id);
+  if (error) { toast('Update failed: ' + error.message); return; }
+  const n = adminState.nominations.find(x => x.id === id);
+  if (n) n.status = newStatus;
+  renderNominationsGrid();
+  renderTopCounts();
+  toast(newStatus === 'contacted' ? 'Marked as contacted' : 'Marked as new');
+};
+
+window.copyToClipboard = (text, btn) => {
+  navigator.clipboard.writeText(text).then(() => {
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = originalText; }, 1400);
+  });
+};
+
+window.deleteNomination = async (id) => {
+  const n = adminState.nominations.find(x => x.id === id);
+  if (!n) return;
+  const label = `${n.nominee_first_name || ''} ${n.nominee_last_name || ''}`.trim() || n.nominee_email;
+  if (!confirm(`Delete nomination of "${label}"?\n\nThis cannot be undone.`)) return;
+  const { error, data } = await sb.from('nominations').delete().eq('id', id).select();
+  if (error) { toast('Delete failed: ' + error.message); return; }
+  if (!data || data.length === 0) {
+    toast('Delete blocked by RLS. Check console.');
+    console.error('Nomination delete returned 0 rows. Run the nominations-schema.sql migration to set up DELETE policy.');
+    return;
+  }
+  adminState.nominations = adminState.nominations.filter(x => x.id !== id);
+  renderNominationsGrid();
+  renderTopCounts();
+  toast('Deleted');
+};
+
+function escapeAttr(s) { return String(s || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;'); }
 
 window.selectSubmission = (id) => {
   adminState.selected = adminState.submissions.find(s => s.id === id);
