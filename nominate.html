@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nominate &mdash; Family Spotlight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+  :root {
+    --paper: #f4ede2; --paper-deep: #ebe1d1; --ink: #1f1b16;
+    --ink-soft: #4a4238; --ink-mute: #7a6f61;
+    --accent: #b8453a; --accent-deep: #8f2d24;
+    --gold: #c89434; --green: #5a7a3e;
+    --shadow: 0 1px 2px rgba(31,27,22,0.05), 0 8px 24px rgba(31,27,22,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--paper); color: var(--ink); font-size: 14px; line-height: 1.5; min-height: 100vh; }
+
+  header.masthead { padding: 32px clamp(24px, 5vw, 64px) 0; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; gap: 16px; flex-wrap: wrap; }
+  .mark { font-family: 'Fraunces', serif; font-weight: 500; font-size: 14px; letter-spacing: 0.3em; text-transform: uppercase; }
+
+  main.page { max-width: 720px; margin: 0 auto; padding: clamp(24px, 4vh, 48px) clamp(24px, 5vw, 64px) clamp(40px, 8vh, 80px); position: relative; z-index: 2; }
+  main.page.hidden { display: none; }
+
+  .eyebrow { display: flex; align-items: center; gap: 14px; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 18px; }
+  .eyebrow::before { content: ""; width: 40px; height: 1px; background: var(--accent); }
+
+  h1 { font-family: 'Fraunces', serif; font-size: clamp(40px, 6vw, 64px); line-height: 1; font-weight: 300; letter-spacing: -0.025em; margin-bottom: 20px; }
+  h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .lede { font-family: 'Fraunces', serif; font-size: clamp(17px, 2vw, 21px); line-height: 1.5; color: var(--ink-soft); font-weight: 300; max-width: 580px; margin-bottom: 36px; }
+
+  .section-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 400; letter-spacing: -0.01em; margin: 32px 0 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(31,27,22,0.15); color: var(--ink); }
+  .section-title:first-of-type { margin-top: 0; }
+
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px; font-weight: 500; }
+  .field input { width: 100%; padding: 12px 14px; border: 1px solid rgba(31,27,22,0.2); background: #fff; font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.5; color: var(--ink); border-radius: 8px; }
+  .field input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+  .field .req { color: var(--accent); margin-left: 4px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid var(--ink); background: transparent; cursor: pointer; font-family: inherit; font-weight: 500; border-radius: 999px; transition: all 0.15s; }
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn .arrow { transition: transform 0.2s; }
+  .btn:hover .arrow { transform: translateX(3px); }
+
+  .actions { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(31,27,22,0.15); display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .err-msg { color: var(--accent); font-size: 13px; margin-top: 16px; display: none; }
+  .err-msg.show { display: block; }
+
+  .spinner { display: inline-block; width: 12px; height: 12px; border: 1.5px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Success state */
+  .success { text-align: center; padding: clamp(60px, 12vh, 120px) clamp(24px, 5vw, 64px); }
+  .success h2 { font-family: 'Fraunces', serif; font-size: clamp(36px, 6vw, 60px); font-weight: 300; letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 18px; }
+  .success h2 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .success p { font-family: 'Fraunces', serif; font-size: 18px; line-height: 1.5; color: var(--ink-soft); max-width: 480px; margin: 0 auto 32px; }
+
+  /* Mobile */
+  @media (max-width: 760px) {
+    header.masthead { padding: 14px 16px 0; }
+    .mark { display: none; }
+    main.page { padding: 16px 20px 32px; }
+    h1 { font-size: clamp(36px, 10vw, 52px); }
+    .lede { font-size: 16px; margin-bottom: 28px; }
+    .field-row { grid-template-columns: 1fr; }
+    .field input { font-size: 16px; }
+    .actions { margin-top: 24px; padding-top: 18px; }
+    .actions .btn { flex: 1; justify-content: center; }
+    .success { padding: 80px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="mark">&nbsp;</div>
+</header>
+
+<main class="page" id="formPage">
+  <div class="eyebrow">A nomination</div>
+  <h1>Nominate a family <em>entrepreneur.</em></h1>
+  <p class="lede">
+    Know someone in the family running a remarkable venture? Send us their name and we'll reach out to invite them to share their story.
+  </p>
+
+  <h2 class="section-title">Who are you nominating?</h2>
+  <div class="field-row">
+    <div class="field">
+      <label>First name <span class="req">*</span></label>
+      <input type="text" id="nominee_first_name" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label>Last name <span class="req">*</span></label>
+      <input type="text" id="nominee_last_name" autocomplete="off" />
+    </div>
+  </div>
+  <div class="field">
+    <label>Email address <span class="req">*</span></label>
+    <input type="email" id="nominee_email" placeholder="they@example.com" autocomplete="off" />
+  </div>
+  <div class="field">
+    <label>Business or company name</label>
+    <input type="text" id="business_name" placeholder="The venture they run" autocomplete="off" />
+  </div>
+
+  <h2 class="section-title">And who are you?</h2>
+  <div class="field-row">
+    <div class="field">
+      <label>First name <span class="req">*</span></label>
+      <input type="text" id="nominator_first_name" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label>Last name <span class="req">*</span></label>
+      <input type="text" id="nominator_last_name" autocomplete="off" />
+    </div>
+  </div>
+
+  <div class="err-msg" id="errMsg"></div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="submitBtn">Send nomination <span class="arrow">&rarr;</span></button>
+  </div>
+</main>
+
+<main class="page success hidden" id="successPage">
+  <h2>Nomination <em>received.</em></h2>
+  <p>Thank you. We'll reach out to them soon to invite them to share their story.</p>
+  <a class="btn btn-primary" href="https://www.aboitizmoraza.com/ventures-and-trades" target="_blank" rel="noopener">Check out The Family Gazette <span class="arrow">&rarr;</span></a>
+</main>
+
+<script>
+const cfg = window.APP_CONFIG;
+const sb = supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+
+const fields = {
+  nominee_first_name: { required: true, label: 'Nominee first name' },
+  nominee_last_name:  { required: true, label: 'Nominee last name' },
+  nominee_email:      { required: true, label: 'Nominee email', email: true },
+  business_name:      { required: false, label: 'Business name' },
+  nominator_first_name: { required: true, label: 'Your first name' },
+  nominator_last_name:  { required: true, label: 'Your last name' },
+};
+
+function showError(msg) {
+  const el = document.getElementById('errMsg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function clearError() {
+  document.getElementById('errMsg').classList.remove('show');
+}
+
+function isValidEmail(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+
+document.getElementById('submitBtn').onclick = async () => {
+  clearError();
+  // Collect + validate
+  const payload = {};
+  for (const [key, meta] of Object.entries(fields)) {
+    const val = document.getElementById(key).value.trim();
+    if (meta.required && !val) {
+      showError(`${meta.label} is required.`);
+      document.getElementById(key).focus();
+      return;
+    }
+    if (meta.email && !isValidEmail(val)) {
+      showError('Please enter a valid email address.');
+      document.getElementById(key).focus();
+      return;
+    }
+    payload[key] = val || null;
+  }
+
+  // Submit to Supabase
+  const btn = document.getElementById('submitBtn');
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner"></span> Sending...';
+  btn.disabled = true;
+
+  try {
+    const { error } = await sb.from('nominations').insert(payload);
+    if (error) throw error;
+    // Show success state
+    document.getElementById('formPage').classList.add('hidden');
+    document.getElementById('successPage').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) {
+    console.error(e);
+    showError('Something went wrong: ' + (e.message || 'please try again.'));
+    btn.innerHTML = originalHtml;
+    btn.disabled = false;
+  }
+};
+
+// Press Enter in any field to submit (except last name to allow natural tabbing)
+document.querySelectorAll('input').forEach(input => {
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('submitBtn').click();
+    }
+  });
+});
+</script>
+</body>
+</html>
